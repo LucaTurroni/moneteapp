@@ -194,6 +194,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 }
 .btn-red:active { background: rgba(224,85,85,.1); }
 .note { font-size: .78rem; color: #444; }
+select.api-input { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='2' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
 
 /* ── ASCOLTO ── */
 #screen-listening { gap: 24px; padding-top: 0; justify-content: center; }
@@ -297,7 +298,7 @@ button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
     </button>
   </div>
   <button class="manual-link" id="btn-go-manual">oppure scegli a mano</button>
-  <span class="ver">v1.0.0.0</span>
+  <span class="ver">v1.0.0.1</span>
 </div>
 
 <!-- ══ SELEZIONE MANUALE ══ -->
@@ -328,6 +329,7 @@ button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
   <div class="tab-bar">
     <button class="tab-btn active" data-tab="tab-api"><span class="ti">🔑</span>API Key</button>
     <button class="tab-btn" data-tab="tab-perm"><span class="ti">🎙️</span>Permessi</button>
+    <button class="tab-btn" data-tab="tab-av"><span class="ti">🎛️</span>Audio/Video</button>
     <button class="tab-btn" data-tab="tab-upd"><span class="ti">🔄</span>Aggiorna</button>
     <button class="tab-btn" data-tab="tab-app"><span class="ti">📱</span>App</button>
   </div>
@@ -363,11 +365,35 @@ button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
     </div>
   </div>
 
+  <!-- TAB AUDIO/VIDEO -->
+  <div class="tab-panel" id="tab-av">
+    <div class="card">
+      <div class="card-title">🔊 Voce sintetizzatore</div>
+      <p class="card-desc">Scegli la voce e la velocità di lettura.</p>
+      <select id="sel-voice" class="api-input" style="padding:12px 14px;cursor:pointer"></select>
+      <div class="perm-row" style="align-items:center;gap:16px">
+        <span class="perm-label" style="white-space:nowrap">Velocità</span>
+        <input type="range" id="range-rate" min="0.5" max="2" step="0.1" value="1" style="flex:1;accent-color:var(--gold)">
+        <span id="rate-val" style="font-family:monospace;color:var(--gold);min-width:30px">1.0</span>
+      </div>
+      <button class="btn-gold" id="btn-test-voice">▶ Ascolta voce</button>
+    </div>
+    <div class="card">
+      <div class="card-title">📷 Fotocamera</div>
+      <p class="card-desc">Scegli quale fotocamera usare per inquadrare le monete.</p>
+      <select id="sel-cam" class="api-input" style="padding:12px 14px;cursor:pointer">
+        <option value="environment">Posteriore (default)</option>
+        <option value="user">Frontale</option>
+      </select>
+      <button class="btn-gold" id="btn-save-av">Salva impostazioni audio/video</button>
+    </div>
+  </div>
+
   <!-- TAB AGGIORNAMENTI -->
   <div class="tab-panel" id="tab-upd">
     <div class="card">
       <div class="card-title">🔄 Aggiornamenti</div>
-      <p class="card-desc">Versione installata: <strong>v1.0.0.0</strong></p>
+      <p class="card-desc">Versione installata: <strong>v1.0.0.1</strong></p>
       <p class="card-desc">L'app controlla automaticamente all'avvio. Se c'è una versione nuova apparirà un banner in basso.</p>
       <button class="btn-gold" id="btn-check-upd">Controlla ora</button>
       <p id="upd-status" class="note"></p>
@@ -438,6 +464,17 @@ button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
   </div>
 </div>
 
+<!-- ══ CONFERMA ══ -->
+<div class="screen hidden" id="screen-confirm">
+  <div class="res-badge" id="conf-badge">🪙</div>
+  <p class="res-main" id="conf-msg" style="text-align:center;max-width:340px;line-height:1.4"></p>
+  <p style="font-size:.9rem;color:var(--muted);text-align:center">Hai capito?</p>
+  <div class="act-row" style="max-width:340px">
+    <button class="btn-gold" id="btn-conf-yes">✅ Sì, ho capito</button>
+    <button class="btn-sec" id="btn-conf-no">🔄 Ripeti</button>
+  </div>
+</div>
+
 <!-- ══ ERRORE ══ -->
 <div class="screen hidden" id="screen-error" role="alert">
   <div style="font-size:3rem">⚠️</div>
@@ -449,49 +486,71 @@ button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 // ══ COSTANTI ══
 const CD = 5;
 const LABELS = {1:'1 centesimo',2:'2 centesimi',5:'5 centesimi',10:'10 centesimi',20:'20 centesimi',50:'50 centesimi',100:'1 euro',200:'2 euro'};
+const VALS = [200,100,50,20,10,5,2,1]; // ordine decrescente per greedy
 const KW = {
-  // 2 euro
-  'due euro':200,'2 euro':200,'due €':200,'dueeuro':200,
-  // 1 euro
-  'un euro':100,'1 euro':100,'uno euro':100,'uneuro':100,'un €':100,
-  // 50 centesimi — tutte le varianti possibili del riconoscimento vocale
-  'cinquanta centesimi':50,'50 centesimi':50,'0,50':50,'0.50':50,'0,5':50,'0.5':50,
-  'mezzo euro':50,'cinquanta':50,'50cent':50,'50 cent':50,
-  'zero virgola cinque':50,'zero virgola cinquanta':50,
-  // 20 centesimi
-  'venti centesimi':20,'20 centesimi':20,'0,20':20,'0.20':20,'0,2':20,'0.2':20,
-  'venti':20,'20cent':20,'20 cent':20,'zero virgola venti':20,
-  // 10 centesimi
-  'dieci centesimi':10,'10 centesimi':10,'0,10':10,'0.10':10,'0,1':10,'0.1':10,
-  'dieci':10,'10cent':10,'10 cent':10,'zero virgola dieci':10,
-  // 5 centesimi
-  'cinque centesimi':5,'5 centesimi':5,'0,05':5,'0.05':5,
-  'cinque':5,'5cent':5,'5 cent':5,'zero virgola zero cinque':5,
-  // 2 centesimi
-  'due centesimi':2,'2 centesimi':2,'0,02':2,'0.02':2,'2cent':2,'2 cent':2,
-  // 1 centesimo
-  'un centesimo':1,'1 centesimo':1,'uno centesimo':1,'0,01':1,'0.01':1,'1cent':1,'1 cent':1
+  'due euro':200,'2 euro':200,'2,00':200,
+  'un euro':100,'1 euro':100,'uno euro':100,'1,00':100,'euro':100,
+  'cinquanta centesimi':50,'50 centesimi':50,'mezzo euro':50,'cinquanta':50,'0,50':50,'0,5':50,'50 cent':50,
+  'venti centesimi':20,'20 centesimi':20,'venti':20,'0,20':20,'20 cent':20,
+  'dieci centesimi':10,'10 centesimi':10,'dieci':10,'0,10':10,'10 cent':10,
+  'cinque centesimi':5,'5 centesimi':5,'cinque':5,'0,05':5,'5 cent':5,
+  'due centesimi':2,'2 centesimi':2,'0,02':2,'2 cent':2,
+  'un centesimo':1,'1 centesimo':1,'0,01':1,'1 cent':1
 };
 
 // ══ STATO ══
 let tVal=null, tLabel='', stream=null, cdInt=null, audio=null, rec=null, prev='screen-home', swReg=null;
+let confirmMsg='', confirmBadge=''; // per schermata conferma
 
 // ══ UTILS ══
 const $=id=>document.getElementById(id);
 
-function speak(txt, int=true){
+function getRate(){ return parseFloat(localStorage.getItem('cm_rate')||'1'); }
+function getVoiceName(){ return localStorage.getItem('cm_voice')||''; }
+function getCamFacing(){ return localStorage.getItem('cm_cam')||'environment'; }
+
+function speak(txt, interrupt=true){
   if(!('speechSynthesis' in window)) return;
-  if(int) speechSynthesis.cancel();
+  if(interrupt) speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(txt);
-  u.lang='it-IT'; u.rate=.95; speechSynthesis.speak(u);
+  u.lang='it-IT'; u.rate=getRate();
+  const vname=getVoiceName();
+  if(vname){
+    const voices=speechSynthesis.getVoices();
+    const v=voices.find(x=>x.name===vname);
+    if(v) u.voice=v;
+  }
+  speechSynthesis.speak(u);
   $('lr').textContent=txt;
 }
 
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
   $(id).classList.remove('hidden');
-  const noTop=['screen-listening','screen-countdown','screen-analyzing','screen-result','screen-error'];
+  const noTop=['screen-listening','screen-countdown','screen-analyzing','screen-result','screen-confirm','screen-error'];
   $('topbar').style.display = noTop.includes(id) ? 'none' : 'flex';
+}
+
+// ══ GREEDY: trova combinazione con meno monete per fare il totale ══
+function greedyCombination(targetCents, availableCoins){
+  // availableCoins: array di valori in centesimi (es [100,50,20])
+  // Restituisce array di valori usati o null se impossibile
+  const counts = {};
+  VALS.forEach(v=>{ counts[v]=(availableCoins.filter(x=>x===v).length); });
+  let remaining = targetCents;
+  const used = [];
+  for(const v of VALS){
+    while(remaining>=v && counts[v]>0){
+      used.push(v); counts[v]--; remaining-=v;
+    }
+    if(remaining===0) break;
+  }
+  return remaining===0 ? used : null;
+}
+
+// Converte valore numerico (centesimi) in label
+function valToLabel(v){
+  return LABELS[v]||`${v} cent`;
 }
 
 // ══ NAVIGAZIONE ══
@@ -503,6 +562,8 @@ $('btn-settings-open').addEventListener('click',()=>{
   prev = document.querySelector('.screen:not(.hidden)')?.id||'screen-home';
   $('api-key-input').value = getKey();
   updateStatus();
+  populateVoices();
+  populateCams();
   showScreen('screen-settings');
 });
 $('btn-back-settings').addEventListener('click',()=>showScreen(prev));
@@ -535,7 +596,7 @@ $('btn-perm-mic').addEventListener('click',async()=>{
     const s=await navigator.mediaDevices.getUserMedia({audio:true});
     s.getTracks().forEach(t=>t.stop());
     b.textContent='✓ OK'; b.className='perm-btn ok'; speak('Microfono autorizzato.');
-  }catch(e){ b.textContent='✗ Negato'; b.className='perm-btn no'; speak('Microfono negato. Vai in Chrome → Impostazioni sito.'); }
+  }catch(e){ b.textContent='✗ Negato'; b.className='perm-btn no'; speak('Microfono negato.'); }
 });
 $('btn-perm-cam').addEventListener('click',async()=>{
   const b=$('btn-perm-cam');
@@ -543,7 +604,82 @@ $('btn-perm-cam').addEventListener('click',async()=>{
     const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
     s.getTracks().forEach(t=>t.stop());
     b.textContent='✓ OK'; b.className='perm-btn ok'; speak('Fotocamera autorizzata.');
-  }catch(e){ b.textContent='✗ Negato'; b.className='perm-btn no'; speak('Fotocamera negata. Vai in Chrome → Impostazioni sito.'); }
+  }catch(e){ b.textContent='✗ Negato'; b.className='perm-btn no'; speak('Fotocamera negata.'); }
+});
+
+// ── Voci sintetizzatore ──
+function populateVoices(){
+  const sel=$('sel-voice');
+  const voices=speechSynthesis.getVoices();
+  const saved=getVoiceName();
+  sel.innerHTML='<option value="">-- Voce predefinita --</option>';
+  voices.filter(v=>v.lang.startsWith('it')||v.lang.startsWith('IT')).forEach(v=>{
+    const o=document.createElement('option');
+    o.value=v.name; o.textContent=v.name+(v.localService?' (locale)':' (online)');
+    if(v.name===saved) o.selected=true;
+    sel.appendChild(o);
+  });
+  // Se nessuna voce italiana, mostra tutte
+  if(sel.options.length<=1){
+    voices.forEach(v=>{
+      const o=document.createElement('option');
+      o.value=v.name; o.textContent=`${v.name} (${v.lang})`;
+      if(v.name===saved) o.selected=true;
+      sel.appendChild(o);
+    });
+  }
+  // Velocità
+  $('range-rate').value=getRate();
+  $('rate-val').textContent=getRate().toFixed(1);
+}
+$('range-rate').addEventListener('input',()=>{
+  $('rate-val').textContent=parseFloat($('range-rate').value).toFixed(1);
+});
+$('btn-test-voice').addEventListener('click',()=>{
+  const v=$('sel-voice').value;
+  if(v) localStorage.setItem('cm_voice',v);
+  localStorage.setItem('cm_rate',$('range-rate').value);
+  speak('Questa è la voce selezionata. Come suona?');
+});
+
+// ── Fotocamera ──
+async function populateCams(){
+  const sel=$('sel-cam');
+  const saved=getCamFacing();
+  try{
+    const devs=await navigator.mediaDevices.enumerateDevices();
+    const cams=devs.filter(d=>d.kind==='videoinput');
+    if(cams.length>0){
+      sel.innerHTML='';
+      cams.forEach((cam,i)=>{
+        const o=document.createElement('option');
+        // Cerca di capire se è frontale o posteriore dal label
+        const lbl=cam.label.toLowerCase();
+        const isFront=lbl.includes('front')||lbl.includes('user')||lbl.includes('selfie')||lbl.includes('facetime');
+        o.value=cam.deviceId;
+        o.textContent=cam.label||`Fotocamera ${i+1}`;
+        o.dataset.facing=isFront?'user':'environment';
+        if((saved===cam.deviceId)||(saved==='environment'&&!isFront&&i===0)) o.selected=true;
+        sel.appendChild(o);
+      });
+    }
+  }catch(e){ /* usa default */ }
+}
+
+$('btn-save-av').addEventListener('click',()=>{
+  const selV=$('sel-voice'), selC=$('sel-cam');
+  if(selV.value) localStorage.setItem('cm_voice',selV.value);
+  else localStorage.removeItem('cm_voice');
+  localStorage.setItem('cm_rate',$('range-rate').value);
+  // Salva deviceId o facing mode
+  const opt=selC.options[selC.selectedIndex];
+  if(opt && opt.value && opt.value!=='environment' && opt.value!=='user'){
+    localStorage.setItem('cm_cam', opt.value); // deviceId specifico
+  } else {
+    localStorage.setItem('cm_cam', opt?opt.value:'environment');
+  }
+  speak('Impostazioni audio e video salvate.');
+  setTimeout(()=>showScreen(prev),900);
 });
 
 // aggiornamenti
@@ -552,17 +688,13 @@ $('btn-check-upd').addEventListener('click',()=>{
   if(swReg){ swReg.update().then(()=>{ setTimeout(()=>{ s.textContent='Sei già alla versione più recente.'; },2000); }); }
   else { s.textContent='Service worker non disponibile.'; }
 });
-
-// disinstalla
 $('btn-uninstall').addEventListener('click',()=>{
   speak('Tieni premuta l\'icona dell\'app sulla schermata home, poi seleziona Disinstalla.');
-  alert('Tieni premuta l\'icona di CercaMoneta sulla schermata home → seleziona Disinstalla.');
+  alert('Tieni premuta l\'icona di CercaMoneta → seleziona Disinstalla.');
 });
-
-// cancella dati
 $('btn-clear-data').addEventListener('click',()=>{
   if(!confirm('Cancellare API key e tutte le impostazioni?')) return;
-  localStorage.clear(); updateStatus(); speak('Dati cancellati. Reinserisci la API key.');
+  localStorage.clear(); updateStatus(); speak('Dati cancellati.');
 });
 
 // ══ API KEY ══
@@ -631,30 +763,22 @@ function startRec(){
   rec.onerror=e=>{ if(e.error==='aborted'||e.error==='no-speech') return; speak('Errore microfono.'); showScreen('screen-home'); };
   rec.start();
 }
-function parseKW(raw){
-  // Normalizza: rimuovi punteggiatura extra, sostituisci varianti
-  let t = raw.toLowerCase().trim()
-    .replace(/[€]/g,' euro ')
-    .replace(/\s+/g,' ')
-    .trim();
 
-  // Prova prima con il testo normalizzato
+function parseKW(raw){
+  let t=raw.toLowerCase().trim().replace(/[€]/g,' euro ').replace(/\s+/g,' ').trim();
   const s=Object.entries(KW).sort((a,b)=>b[0].length-a[0].length);
   for(const [k,v] of s){ if(t.includes(k)) return v; }
-
-  // Estrai numeri dal testo e prova a matchare
-  // es: "zero virgola cinquanta" → già coperto; "cinquantacentesimi" → normalizza
-  const nums = t.match(/\d+[.,]?\d*/g);
+  const nums=t.match(/\d+[.,]?\d*/g);
   if(nums){
-    const n = parseFloat(nums[0].replace(',','.'));
-    if(n===2) return 200;
-    if(n===1) return 100;
+    const n=parseFloat(nums[0].replace(',','.'));
+    if(n===2||n===2.00) return 200;
+    if(n===1||n===1.00) return 100;
     if(n===0.5||n===50) return 50;
     if(n===0.2||n===20) return 20;
     if(n===0.1||n===10) return 10;
     if(n===0.05||n===5) return 5;
-    if(n===0.02||n===2) return 2;
-    if(n===0.01||n===1) return 1;
+    if(n===0.02) return 2;
+    if(n===0.01) return 1;
   }
   return null;
 }
@@ -672,7 +796,11 @@ document.querySelectorAll('.coin-btn').forEach(b=>{
 async function startCD(){
   showScreen('screen-countdown'); $('cd-target').textContent=tLabel;
   try{
-    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:640},height:{ideal:480}}});
+    const camSaved=getCamFacing();
+    const constraints = camSaved && camSaved!=='environment' && camSaved!=='user'
+      ? {video:{deviceId:{exact:camSaved},width:{ideal:640},height:{ideal:480}}}
+      : {video:{facingMode:camSaved||'environment',width:{ideal:640},height:{ideal:480}}};
+    stream=await navigator.mediaDevices.getUserMedia(constraints);
     $('video').srcObject=stream; await $('video').play();
   }catch(e){ showErr('Non riesco ad accedere alla fotocamera. Vai nelle Impostazioni → Permessi.'); return; }
 
@@ -709,18 +837,19 @@ async function analyze(img){
   const prompt=`Sei un assistente per non vedenti che identifica monete euro in fila su un tavolo.
 Analizza l'immagine:
 1. Individua TUTTE le monete visibili ordinate da SINISTRA a DESTRA
-2. Classifica ogni moneta: 1 centesimo, 2 centesimi, 5 centesimi, 10 centesimi, 20 centesimi, 50 centesimi, 1 euro, 2 euro
+2. Classifica ogni moneta con uno di questi valori ESATTI: 1 centesimo, 2 centesimi, 5 centesimi, 10 centesimi, 20 centesimi, 50 centesimi, 1 euro, 2 euro
 3. Trova la posizione di "${tLabel}" contando da 1 da sinistra
+
 Rispondi SOLO con JSON, zero testo extra:
-{"monete":["1 euro","50 centesimi"],"posizione_cercata":1,"trovata":true,"messaggio":"La moneta da ${tLabel} è la prima da sinistra"}
-Se non vedi monete: {"monete":[],"posizione_cercata":-1,"trovata":false,"messaggio":"Non riesco a vedere monete chiaramente."}
-Se la moneta non c'è: {"trovata":false,"posizione_cercata":-1,"monete":["..."],"messaggio":"La moneta da ${tLabel} non è presente."}`;
+{"monete":["1 euro","50 centesimi"],"valori_centesimi":[100,50],"posizione_cercata":1,"trovata":true,"messaggio":"La moneta da ${tLabel} e' la prima da sinistra"}
+Se non vedi monete: {"monete":[],"valori_centesimi":[],"posizione_cercata":-1,"trovata":false,"messaggio":"Non riesco a vedere monete chiaramente."}
+Se la moneta non c'e': {"trovata":false,"posizione_cercata":-1,"monete":["..."],"valori_centesimi":[...],"messaggio":"La moneta da ${tLabel} non e' presente."}`;
 
   try{
     const r=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-opus-4-5',max_tokens:400,messages:[{role:'user',content:[
+      body:JSON.stringify({model:'claude-opus-4-5',max_tokens:500,messages:[{role:'user',content:[
         {type:'image',source:{type:'base64',media_type:'image/jpeg',data:img}},
         {type:'text',text:prompt}
       ]}]})
@@ -739,8 +868,10 @@ Se la moneta non c'è: {"trovata":false,"posizione_cercata":-1,"monete":["..."],
 // ══ RISULTATO ══
 function showResult(data){
   showScreen('screen-result');
-  const{trovata,posizione_cercata,monete,messaggio}=data;
-  if(trovata&&posizione_cercata>0){
+  const{trovata,posizione_cercata,monete,valori_centesimi,messaggio}=data;
+
+  if(trovata && posizione_cercata>0){
+    // CASO 1: moneta trovata
     $('res-badge').textContent='✅'; $('res-main').textContent=messaggio;
     const l=$('res-list'); l.innerHTML='';
     (monete||[]).forEach((m,i)=>{
@@ -750,44 +881,107 @@ function showResult(data){
       r.innerHTML=`<div class="pos-b">${i+1}</div><span>${m}</span>${t?' 🎯':''}`;
       l.appendChild(r);
     });
-    speak(messaggio); winSound(); vib([100,50,100,50,300]);
+
+    // Messaggio dettagliato per la conferma
+    const pos=posizione_cercata;
+    const tot=(monete||[]).length;
+    const ordini=['prima','seconda','terza','quarta','quinta','sesta','settima','ottava'];
+    const ord=ordini[pos-1]||`numero ${pos}`;
+    const confTxt=`La moneta da ${tLabel} è la ${ord} da sinistra, su ${tot} monete in totale. Prendila al posto numero ${pos}.`;
+    confirmMsg=confTxt;
+    confirmBadge='✅';
+
+    speak(messaggio);
+    winSound(); vib([100,50,100,50,300]);
+
+    // Dopo 2 secondi vai alla schermata di conferma
+    setTimeout(()=>showConfirm(), 2000);
+
+  } else if((monete||[]).length>0 && (valori_centesimi||[]).length>0){
+    // CASO 2: moneta non trovata — prova combinazione greedy
+    const availCents = valori_centesimi;
+    const combination = greedyCombination(tVal, availCents);
+
+    $('res-badge').textContent='❌';
+
+    if(combination){
+      // Trovata combinazione
+      const grouped={};
+      combination.forEach(v=>{ grouped[v]=(grouped[v]||0)+1; });
+      const descParts=Object.entries(grouped).map(([v,n])=>`${n} moneta${n>1?'e':''} da ${valToLabel(parseInt(v))}`);
+      const desc=descParts.join(' e ');
+      const totUsed=combination.length;
+      const mainMsg=`La moneta da ${tLabel} non c'è, ma puoi fare ${tLabel} usando ${totUsed} moneta${totUsed>1?'e':''}: ${desc}.`;
+      $('res-main').textContent=mainMsg;
+
+      // Lista monete usate
+      const l=$('res-list'); l.innerHTML='';
+      combination.forEach((v,i)=>{
+        const r=document.createElement('div'); r.className='coin-row hi';
+        r.innerHTML=`<div class="pos-b">${i+1}</div><span>${valToLabel(v)}</span> 🪙`;
+        l.appendChild(r);
+      });
+
+      confirmMsg=`Non c'è la moneta da ${tLabel}. Puoi però usare ${desc} per fare la stessa cifra. Prendi queste ${totUsed} monete.`;
+      confirmBadge='💡';
+      speak(mainMsg);
+      vib([200,100,200]);
+      setTimeout(()=>showConfirm(), 2500);
+
+    } else {
+      // Nessuna combinazione possibile
+      const noMsg=`La moneta da ${tLabel} non è presente e non è possibile formare la cifra con le monete visibili.`;
+      $('res-main').textContent=noMsg;
+      const l=$('res-list'); l.innerHTML='';
+      (monete||[]).forEach((m,i)=>{
+        const r=document.createElement('div'); r.className='coin-row';
+        r.innerHTML=`<div class="pos-b">${i+1}</div><span>${m}</span>`;
+        l.appendChild(r);
+      });
+      confirmMsg=noMsg;
+      confirmBadge='❌';
+      speak(noMsg);
+      vib([500]);
+      setTimeout(()=>showConfirm(), 2500);
+    }
+
   } else {
-    $('res-badge').textContent=(monete||[]).length===0?'📷':'❌';
+    // CASO 3: nessuna moneta visibile
+    $('res-badge').textContent='📷';
     $('res-main').textContent=messaggio;
-    const l=$('res-list'); l.innerHTML='';
-    (monete||[]).forEach((m,i)=>{
-      const r=document.createElement('div'); r.className='coin-row';
-      r.innerHTML=`<div class="pos-b">${i+1}</div><span>${m}</span>`;
-      l.appendChild(r);
-    });
+    $('res-list').innerHTML='';
     speak(messaggio); vib([500]);
   }
 }
+
+// ══ SCHERMATA CONFERMA ══
+function showConfirm(){
+  $('conf-badge').textContent=confirmBadge;
+  $('conf-msg').textContent=confirmMsg;
+  showScreen('screen-confirm');
+  // Riléggi il messaggio e poi chiedi conferma
+  setTimeout(()=>{
+    speak(confirmMsg+'. Hai capito?');
+  }, 300);
+}
+
+$('btn-conf-yes').addEventListener('click',()=>{
+  speak('Ottimo! Torno alla schermata principale.');
+  setTimeout(()=>showScreen('screen-home'), 800);
+});
+
+$('btn-conf-no').addEventListener('click',()=>{
+  // Ripete il messaggio e poi richiede conferma vocale
+  speak(confirmMsg+'. Hai capito?');
+});
 
 $('btn-repeat').addEventListener('click',()=>{ initAudio(); speak(`Cerchiamo di nuovo: ${tLabel}.`); setTimeout(startCD,800); });
 $('btn-home-result').addEventListener('click',()=>showScreen('screen-home'));
 $('btn-err-home').addEventListener('click',()=>showScreen('screen-home'));
 function showErr(msg){ stopCam(); clearInterval(cdInt); $('err-msg').textContent=msg; showScreen('screen-error'); speak(msg); }
 
-// ══ SERVICE WORKER ══
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('./sw.js').then(r=>{
-    swReg=r; r.update();
-    r.addEventListener('updatefound',()=>{
-      const w=r.installing;
-      w.addEventListener('statechange',()=>{
-        // Quando il nuovo SW è installato e prende controllo → ricarica subito
-        if(w.state==='installed'&&navigator.serviceWorker.controller){
-          // skipWaiting già fatto nel SW, aspettiamo il controllerchange
-        }
-      });
-    });
-  }).catch(()=>{});
-  // Il nuovo SW ha preso controllo → ricarica per caricare i file freschi
-  navigator.serviceWorker.addEventListener('controllerchange',()=>{
-    window.location.reload(true); // true = bypassa cache browser
-  });
-}
+// Carica voci quando disponibili
+speechSynthesis.onvoiceschanged = ()=>{ /* pronte per quando si apre impostazioni */ };
 
 // ══ MANIFEST INLINE ══
 (function(){
