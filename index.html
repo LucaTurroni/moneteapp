@@ -296,7 +296,7 @@ button:focus-visible{outline:3px solid var(--gold);outline-offset:2px;}
     </button>
   </div>
   <button class="manual-link" id="btn-go-manual">oppure scegli a mano</button>
-  <span class="ver">v1.0.0.3</span>
+  <span class="ver">v1.0.0.4</span>
 </div>
 
 <!-- ══ SELEZIONE MANUALE ══ -->
@@ -380,7 +380,7 @@ button:focus-visible{outline:3px solid var(--gold);outline-offset:2px;}
   <div class="tab-panel" id="tab-upd">
     <div class="card">
       <div class="card-title">🔄 Aggiornamenti</div>
-      <p class="card-desc">Versione installata: <strong>v1.0.0.3</strong></p>
+      <p class="card-desc">Versione installata: <strong>v1.0.0.4</strong></p>
       <p class="card-desc">L'app controlla automaticamente all'avvio. Se c'è una versione nuova apparirà un banner in basso.</p>
       <button class="btn-gold" id="btn-check-upd">Controlla ora</button>
       <p id="upd-status" class="note"></p>
@@ -541,12 +541,13 @@ function parseVoice(rawText) {
 
 // ══ GREEDY: combinazione con meno monete ══
 function greedyCombo(targetCents, availCents) {
+  // Ordina dal più grande al più piccolo, poi prende ogni moneta disponibile una volta
   const pool = [...availCents].sort((a,b)=>b-a);
   let remaining = targetCents;
   const used = [];
   for (const v of pool) {
-    if (remaining >= v) { used.push(v); remaining -= v; }
-    if (remaining === 0) break;
+    if (remaining <= 0) break;
+    if (v <= remaining) { used.push(v); remaining -= v; }
   }
   return remaining === 0 ? used : null;
 }
@@ -744,7 +745,11 @@ $('btn-voice').addEventListener('click',()=>{
   initAudio(); if(!needKey()) return;
   if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){ showErr('Riconoscimento vocale non supportato. Usa Chrome su Android.'); return; }
   showScreen('screen-listening');
-  setTimeout(startRec, 700);
+  $('voice-transcript').textContent='In attesa…';
+  // Prima parla, POI avvia il microfono (evita che registri la sua stessa voce)
+  speak('Dimmi la moneta che vuoi cercare.', ()=>{
+    setTimeout(startRec, 400);
+  });
 });
 $('btn-cancel-voice').addEventListener('click',()=>{ if(rec){rec.abort();rec=null;} showScreen('screen-home'); });
 
@@ -832,24 +837,35 @@ function stopCam(){ if(camStream){ camStream.getTracks().forEach(t=>t.stop()); c
 
 // ══ ANALISI ══
 async function analyze(img){
-  const prompt=`Sei un assistente visivo per non vedenti. Analizza questa immagine di monete euro disposte in fila su un tavolo.
+  const prompt=`Sei un esperto riconoscitore di monete euro. Analizza ATTENTAMENTE questa immagine.
 
-Istruzioni:
-1. Identifica TUTTE le monete visibili, ordinate rigorosamente da SINISTRA a DESTRA
-2. Per ogni moneta usa ESATTAMENTE uno di questi valori: 1 centesimo, 2 centesimi, 5 centesimi, 10 centesimi, 20 centesimi, 50 centesimi, 1 euro, 2 euro
-3. Per ogni moneta fornisci anche il valore numerico in centesimi interi (1 centesimo=1, 2 centesimi=2, 5 centesimi=5, 10 centesimi=10, 20 centesimi=20, 50 centesimi=50, 1 euro=100, 2 euro=200)
-4. Cerca la moneta da "${tLabel}" (valore: ${tVal} centesimi) nella fila
+Le monete euro hanno queste caratteristiche distintive:
+- 1 centesimo: piccola, bordo liscio, colore rame scuro
+- 2 centesimi: piccola, bordo scanalato su un lato, rame
+- 5 centesimi: media, bordo liscio, rame
+- 10 centesimi: media, bordo scanalato, colore oro giallo
+- 20 centesimi: media con bordo "spagnolo" ondulato, oro giallo
+- 50 centesimi: grande, bordo scanalato, oro giallo
+- 1 euro: grande, bordo con alternanza liscio/scanalato, bicolore (centro argento, bordo oro)
+- 2 euro: molto grande, bordo con iscrizione in rilievo, bicolore (centro oro, bordo argento)
 
-Rispondi SOLO con JSON valido, senza markdown, senza testo aggiuntivo:
-{
-  "monete": ["1 euro", "50 centesimi", "2 euro"],
-  "centesimi": [100, 50, 200],
-  "posizione_cercata": 1,
-  "trovata": true
-}
+COMPITO:
+1. Guarda ATTENTAMENTE ogni oggetto rotondo nell'immagine
+2. Identifica TUTTE le monete presenti da sinistra a destra
+3. Se l'illuminazione è scarsa o le monete si sovrappongono, fai del tuo meglio
+4. Anche se vedi solo 1 moneta, riportala
+5. Non dichiarare "nessuna moneta" se vedi oggetti rotondi metallici — identificali
 
-Se non vedi monete chiaramente: {"monete":[],"centesimi":[],"posizione_cercata":-1,"trovata":false}
-Se la moneta cercata non c'è ma ne vedi altre: {"monete":[...],"centesimi":[...],"posizione_cercata":-1,"trovata":false}`;
+Per ogni moneta usa ESATTAMENTE uno di questi valori: 1 centesimo, 2 centesimi, 5 centesimi, 10 centesimi, 20 centesimi, 50 centesimi, 1 euro, 2 euro
+Valore in centesimi: 1cent=1, 2cent=2, 5cent=5, 10cent=10, 20cent=20, 50cent=50, 1euro=100, 2euro=200
+
+Moneta cercata: "${tLabel}" (${tVal} centesimi)
+
+Rispondi SOLO con JSON valido, senza markdown:
+{"monete":["1 euro","50 centesimi"],"centesimi":[100,50],"posizione_cercata":1,"trovata":true}
+
+Se proprio non riesci a distinguere nulla: {"monete":[],"centesimi":[],"posizione_cercata":-1,"trovata":false}
+Se la moneta cercata non c'è: {"monete":[...],"centesimi":[...],"posizione_cercata":-1,"trovata":false}`;
 
   try{
     const r=await fetch('https://api.anthropic.com/v1/messages',{
@@ -943,7 +959,7 @@ function showResult(data){
       setTimeout(()=>showConfirm(),2500);
     }
   } else {
-    const msg='Non riesco a vedere monete chiaramente. Prova a migliorare l\'illuminazione e a tenere la fotocamera ferma.';
+    const msg='Non vedo monete. Assicurati che le monete siano ben illuminate, al centro dell\'inquadratura, e che la fotocamera sia a circa 20 centimetri dal tavolo. Poi riprova.';
     $('res-badge').textContent='📷'; $('res-main').textContent=msg; $('res-list').innerHTML='';
     speak(msg); vib([500]);
   }
