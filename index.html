@@ -8,281 +8,280 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>CercaMoneta</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;700;800&family=Space+Mono:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800&family=Space+Mono:wght@700&display=swap');
 
 :root {
-  --bg: #0d0d1a;
-  --surface: #1a1a2e;
-  --gold: #f5c842;
-  --gold-dark: #c9a020;
-  --text: #f0f0f0;
-  --muted: #888;
-  --danger: #e05555;
-  --success: #4caf7d;
-  --radius: 18px;
+  --bg:#0d0d1a; --surface:#1a1a2e; --surface2:#242440;
+  --gold:#f5c842; --gold-dark:#c9a020; --gold-text:#1a1000;
+  --text:#f0f0f0; --text2:#b0b8c8; --muted:#666;
+  --border:#2a2a42; --danger:#e05555; --success:#4caf7d;
+  --radius:18px; --radius-sm:10px;
+}
+.light {
+  --bg:#f4f4f0; --surface:#ffffff; --surface2:#eaeaea;
+  --text:#111122; --text2:#444466; --muted:#888;
+  --border:#d0d0e0;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Lexend', sans-serif; overflow: hidden; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Lexend',sans-serif;overflow:hidden;transition:background .3s,color .3s;}
 
 /* ── SCHERMATE ── */
-.screen {
-  position: fixed; inset: 0;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 24px; gap: 20px;
-  transition: opacity .25s, transform .25s;
-  overflow-y: auto;
+.screen{
+  position:fixed;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:24px;gap:18px;
+  transition:opacity .25s,transform .25s;overflow-y:auto;
 }
-.screen.hidden { opacity: 0; pointer-events: none; transform: translateY(12px); }
+.screen.hidden{opacity:0;pointer-events:none;transform:translateY(12px);}
 
 /* ── TOPBAR ── */
-#topbar {
-  position: fixed; top: 0; left: 0; right: 0; height: 52px;
-  display: flex; align-items: center; justify-content: flex-end;
-  padding: 0 20px; z-index: 100;
-  background: linear-gradient(to bottom, var(--bg) 70%, transparent);
+#topbar{
+  position:fixed;top:0;left:0;right:0;height:56px;
+  display:flex;align-items:center;justify-content:flex-end;gap:8px;
+  padding:0 16px;z-index:100;
+  background:var(--bg);
+  border-bottom:2px solid var(--border);
 }
-#topbar.hidden { display: none; }
-.icon-btn {
-  width: 42px; height: 42px; border-radius: 50%; border: none;
-  background: var(--surface); color: var(--gold); font-size: 1.1rem;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
+#topbar.off{display:none;}
+.icon-btn{
+  width:44px;height:44px;border-radius:50%;
+  border:2px solid var(--border);
+  background:var(--surface);color:var(--gold);font-size:1.1rem;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .2s,border-color .2s;
 }
+.icon-btn:active{background:var(--surface2);}
 
 /* ── HOME ── */
-#screen-home { justify-content: center; padding-top: 0; gap: 32px; }
-.app-title { font-size: 1.5rem; font-weight: 800; color: var(--gold); text-align: center; }
+#screen-home{justify-content:center;padding-top:0;gap:28px;}
+.app-title{font-size:1.6rem;font-weight:800;color:var(--gold);text-align:center;letter-spacing:-.5px;}
 
-@keyframes pr { 0% { transform: scale(1); opacity: .45; } 100% { transform: scale(1.55); opacity: 0; } }
-.voice-wrap { position: relative; display: flex; align-items: center; justify-content: center; }
-.pr { position: absolute; width: 220px; height: 220px; border-radius: 50%; border: 3px solid var(--gold); opacity: 0; animation: pr 1.6s ease-out infinite; }
-.pr.d { animation-delay: .8s; }
+@keyframes pr{0%{transform:scale(1);opacity:.4;}100%{transform:scale(1.55);opacity:0;}}
+.voice-wrap{position:relative;display:flex;align-items:center;justify-content:center;}
+.pr{position:absolute;width:220px;height:220px;border-radius:50%;border:3px solid var(--gold);opacity:0;animation:pr 1.6s ease-out infinite;}
+.pr.d{animation-delay:.8s;}
 
-.big-voice-btn {
-  width: 200px; height: 200px; border-radius: 50%;
-  background: linear-gradient(145deg, var(--gold-dark), var(--gold));
-  border: none; cursor: pointer;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
-  box-shadow: 0 0 50px rgba(245,200,66,.28), 0 8px 28px rgba(0,0,0,.5);
-  transition: transform .15s; position: relative; z-index: 1;
+.big-voice-btn{
+  width:200px;height:200px;border-radius:50%;
+  background:linear-gradient(145deg,var(--gold-dark),var(--gold));
+  border:none;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 0 50px rgba(245,200,66,.3),0 8px 28px rgba(0,0,0,.4);
+  transition:transform .15s;position:relative;z-index:1;
 }
-.big-voice-btn:active { transform: scale(.93); }
-.big-voice-btn .mic-icon { font-size: 4rem; line-height: 1; }
-.big-voice-btn .mic-label { font-size: .95rem; font-weight: 700; color: #1a1000; }
+.big-voice-btn:active{transform:scale(.93);}
+.big-voice-btn .mic-icon{font-size:4rem;line-height:1;}
+.big-voice-btn .mic-label{font-size:1rem;font-weight:700;color:var(--gold-text);}
 
-.manual-link {
-  position: fixed; bottom: 36px;
-  font-size: 1rem; font-weight: 700; color: #1a1000;
-  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
-  border: none; border-radius: 50px;
-  cursor: pointer; font-family: 'Lexend', sans-serif;
-  padding: 14px 36px;
-  box-shadow: 0 4px 16px rgba(245,200,66,.3);
-  transition: transform .15s, box-shadow .15s;
-  z-index: 10;
+.manual-link{
+  position:fixed;bottom:36px;
+  font-size:1rem;font-weight:700;color:var(--gold-text);
+  background:linear-gradient(135deg,var(--gold-dark),var(--gold));
+  border:none;border-radius:50px;cursor:pointer;
+  font-family:'Lexend',sans-serif;padding:15px 40px;
+  box-shadow:0 4px 16px rgba(245,200,66,.35);
+  transition:transform .15s;z-index:10;
 }
-.manual-link:active { transform: scale(.96); box-shadow: 0 2px 8px rgba(245,200,66,.2); }
-
-.ver { position: fixed; bottom: 14px; font-size: .7rem; color: #252535; font-family: monospace; }
+.manual-link:active{transform:scale(.96);}
+.ver{position:fixed;bottom:14px;font-size:.7rem;color:var(--muted);font-family:monospace;}
 
 /* ── SELEZIONE MANUALE ── */
-#screen-manual { justify-content: flex-start; padding-top: 72px; padding-bottom: 24px; gap: 14px; }
-.page-header { display: flex; align-items: center; gap: 12px; width: 100%; max-width: 420px; }
-.back-btn {
-  width: 38px; height: 38px; border-radius: 50%; border: 2px solid #333;
-  background: transparent; color: var(--muted); font-size: 1.1rem;
-  cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+#screen-manual{justify-content:flex-start;padding-top:80px;padding-bottom:28px;gap:14px;}
+.page-header{display:flex;align-items:center;gap:12px;width:100%;max-width:420px;}
+.back-btn{
+  width:44px;height:44px;border-radius:50%;
+  border:2px solid var(--border);background:var(--surface);
+  color:var(--text);font-size:1.2rem;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:background .2s;
 }
-.page-title { font-size: 1.15rem; font-weight: 700; }
+.back-btn:active{background:var(--surface2);}
+.page-title{font-size:1.2rem;font-weight:700;}
 
-.coins-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; max-width: 420px; }
-.coin-btn {
-  background: var(--surface); border: 2px solid #2a2a40; border-radius: var(--radius);
-  padding: 20px 12px; display: flex; flex-direction: column; align-items: center; gap: 8px;
-  cursor: pointer; font-family: 'Lexend', sans-serif; transition: border-color .15s, transform .15s;
+.coins-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;width:100%;max-width:420px;}
+.coin-btn{
+  background:var(--surface);border:2px solid var(--border);border-radius:var(--radius);
+  padding:20px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;
+  cursor:pointer;font-family:'Lexend',sans-serif;
+  transition:border-color .15s,transform .15s,background .15s;
 }
-.coin-btn:active { transform: scale(.95); border-color: var(--gold); }
-.coin-icon { width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Space Mono', monospace; font-size: .82rem; font-weight: 700; }
-.coin-label { font-size: 1rem; font-weight: 600; }
-.c1,.c2,.c5 { background: radial-gradient(circle at 35% 35%, #c8622a, #8b3d1a); color: #ffd9b0; }
-.c10,.c20,.c50 { background: radial-gradient(circle at 35% 35%, #d4a840, #9a7820); color: #fff7d0; }
-.c100,.c200 { background: radial-gradient(circle at 35% 35%, #d0d0d0, #909090); color: #fff; }
+.coin-btn:active{transform:scale(.95);border-color:var(--gold);background:var(--surface2);}
+.coin-icon{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:.85rem;font-weight:700;border:3px solid rgba(255,255,255,.15);}
+.coin-label{font-size:1rem;font-weight:700;color:var(--text);}
+.c1,.c2,.c5{background:radial-gradient(circle at 35% 35%,#d06535,#7a3010);color:#ffd9b0;}
+.c10,.c20,.c50{background:radial-gradient(circle at 35% 35%,#d4a840,#9a7020);color:#fff3c0;}
+.c100,.c200{background:radial-gradient(circle at 35% 35%,#e0e0e0,#909090);color:#222;}
 
 /* ── IMPOSTAZIONI ── */
-#screen-settings { justify-content: flex-start; padding: 0; gap: 0; overflow-y: auto; }
-.settings-top { display: flex; align-items: center; gap: 12px; width: 100%; padding: 64px 24px 12px; }
-.settings-title { font-size: 1.3rem; font-weight: 700; }
+#screen-settings{justify-content:flex-start;padding:0;gap:0;overflow-y:auto;}
+.settings-top{display:flex;align-items:center;gap:12px;width:100%;padding:68px 20px 14px;border-bottom:2px solid var(--border);}
+.settings-title{font-size:1.3rem;font-weight:700;}
 
-/* tab bar */
-.tab-bar {
-  display: flex; width: 100%;
-  border-bottom: 2px solid #1e1e30;
-  overflow-x: auto; scrollbar-width: none;
-  flex-shrink: 0;
+.tab-bar{display:flex;width:100%;border-bottom:2px solid var(--border);overflow-x:auto;scrollbar-width:none;flex-shrink:0;}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab-btn{
+  flex:1;min-width:68px;padding:10px 4px 9px;
+  border:none;border-bottom:3px solid transparent;margin-bottom:-2px;
+  background:none;color:var(--muted);
+  font-family:'Lexend',sans-serif;font-size:.68rem;font-weight:700;
+  cursor:pointer;text-align:center;white-space:nowrap;
+  transition:color .2s,border-color .2s;
 }
-.tab-bar::-webkit-scrollbar { display: none; }
-.tab-btn {
-  flex: 1; min-width: 72px; padding: 10px 4px 8px;
-  border: none; border-bottom: 2px solid transparent; margin-bottom: -2px;
-  background: none; color: var(--muted);
-  font-family: 'Lexend', sans-serif; font-size: .7rem; font-weight: 600;
-  cursor: pointer; text-align: center; white-space: nowrap;
-  transition: color .2s, border-color .2s;
-}
-.tab-btn .ti { display: block; font-size: 1.15rem; margin-bottom: 2px; }
-.tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+.tab-btn .ti{display:block;font-size:1.2rem;margin-bottom:2px;}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
 
-/* tab panels */
-.tab-panel { display: none; flex-direction: column; gap: 14px; width: 100%; padding: 16px 24px 32px; }
-.tab-panel.active { display: flex; }
+.tab-panel{display:none;flex-direction:column;gap:14px;width:100%;padding:16px 20px 36px;}
+.tab-panel.active{display:flex;}
 
-/* card */
-.card {
-  background: var(--surface); border-radius: var(--radius);
-  padding: 18px; width: 100%; max-width: 420px;
-  display: flex; flex-direction: column; gap: 10px;
-}
-.card-title { font-size: .76rem; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: .1em; }
-.card-desc { font-size: .86rem; color: var(--muted); line-height: 1.6; }
-.card-desc a { color: var(--gold); text-decoration: none; }
-.card-desc strong { color: #c8d0d8; }
+.card{background:var(--surface);border:2px solid var(--border);border-radius:var(--radius);padding:18px;width:100%;max-width:440px;display:flex;flex-direction:column;gap:12px;}
+.card-title{font-size:.76rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;}
+.card-desc{font-size:.88rem;color:var(--text2);line-height:1.6;}
+.card-desc a{color:var(--gold);text-decoration:none;}
+.card-desc strong{color:var(--text);}
 
-/* input api */
-.input-wrap { position: relative; }
-.api-input {
-  width: 100%; background: #0d0d1a; border: 2px solid #333; border-radius: 12px;
-  padding: 14px 44px 14px 14px; color: var(--text);
-  font-family: 'Space Mono', monospace; font-size: .85rem;
-  outline: none; transition: border-color .2s;
+.input-wrap{position:relative;}
+.api-input{
+  width:100%;background:var(--bg);border:2px solid var(--border);border-radius:var(--radius-sm);
+  padding:13px 44px 13px 14px;color:var(--text);
+  font-family:'Space Mono',monospace;font-size:.85rem;
+  outline:none;transition:border-color .2s;
 }
-.api-input:focus { border-color: var(--gold); }
-.api-input::placeholder { color: #444; }
-.eye-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); font-size: 1rem; cursor: pointer; }
+.api-input:focus{border-color:var(--gold);}
+.api-input::placeholder{color:var(--muted);}
+select.api-input{cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='2' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-color:var(--bg);}
+.eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);font-size:1rem;cursor:pointer;}
 
-/* status pill */
-.pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 50px; font-size: .8rem; font-weight: 600; }
-.pill.ok { background: rgba(76,175,125,.15); color: var(--success); }
-.pill.no { background: rgba(224,85,85,.12); color: var(--danger); }
-.pill-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:50px;font-size:.82rem;font-weight:600;}
+.pill.ok{background:rgba(76,175,125,.15);color:var(--success);}
+.pill.no{background:rgba(224,85,85,.12);color:var(--danger);}
+.pill-dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
 
-/* perm row */
-.perm-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.perm-label { font-size: .9rem; }
-.perm-btn {
-  background: #0d0d1a; border: 2px solid #333; border-radius: 10px;
-  padding: 7px 14px; color: var(--muted);
-  font-family: 'Lexend', sans-serif; font-size: .8rem; cursor: pointer;
-  transition: border-color .2s, color .2s; white-space: nowrap;
+.perm-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 0;}
+.perm-label{font-size:.9rem;font-weight:600;color:var(--text);}
+.perm-btn{
+  background:var(--surface2);border:2px solid var(--border);border-radius:var(--radius-sm);
+  padding:9px 16px;color:var(--text2);
+  font-family:'Lexend',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;
+  transition:border-color .2s,color .2s;white-space:nowrap;
 }
-.perm-btn.ok { border-color: var(--success); color: var(--success); }
-.perm-btn.no { border-color: var(--danger); color: var(--danger); }
+.perm-btn.ok{border-color:var(--success);color:var(--success);}
+.perm-btn.no{border-color:var(--danger);color:var(--danger);}
 
-/* bottoni */
-.btn-gold {
-  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
-  color: #1a1000; border: none; border-radius: var(--radius);
-  padding: 15px 20px; font-family: 'Lexend', sans-serif; font-size: .95rem; font-weight: 700;
-  cursor: pointer; width: 100%; transition: transform .15s;
+/* ── BOTTONI GENERICI ── */
+.btn-gold{
+  background:linear-gradient(135deg,var(--gold-dark),var(--gold));
+  color:var(--gold-text);border:none;border-radius:var(--radius);
+  padding:16px 24px;font-family:'Lexend',sans-serif;font-size:1rem;font-weight:700;
+  cursor:pointer;width:100%;transition:transform .15s,box-shadow .15s;
+  box-shadow:0 3px 12px rgba(245,200,66,.25);
 }
-.btn-gold:active { transform: scale(.97); }
-.btn-red {
-  background: transparent; border: 2px solid var(--danger); border-radius: var(--radius);
-  padding: 13px 20px; color: var(--danger);
-  font-family: 'Lexend', sans-serif; font-size: .95rem; font-weight: 700;
-  cursor: pointer; width: 100%; transition: background .2s;
+.btn-gold:active{transform:scale(.97);}
+.btn-red{
+  background:transparent;border:2px solid var(--danger);border-radius:var(--radius);
+  padding:14px 24px;color:var(--danger);
+  font-family:'Lexend',sans-serif;font-size:.95rem;font-weight:700;
+  cursor:pointer;width:100%;transition:background .2s;
 }
-.btn-red:active { background: rgba(224,85,85,.1); }
-.note { font-size: .78rem; color: #444; }
-select.api-input { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='2' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+.btn-red:active{background:rgba(224,85,85,.1);}
+.btn-sec{
+  background:var(--surface2);color:var(--text);border:2px solid var(--border);
+  border-radius:var(--radius);padding:14px 20px;
+  font-family:'Lexend',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;flex:1;
+  transition:background .2s,border-color .2s;
+}
+.btn-sec:active{background:var(--border);}
+.act-row{display:flex;gap:12px;width:100%;max-width:380px;}
+.act-row .btn-gold{flex:1;}
+.cancel-btn{
+  background:var(--surface);color:var(--text2);
+  border:2px solid var(--border);border-radius:50px;
+  padding:12px 32px;font-family:'Lexend',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;
+  transition:background .2s,border-color .2s;
+}
+.cancel-btn:active{background:var(--surface2);}
+.note{font-size:.78rem;color:var(--muted);}
 
 /* ── ASCOLTO ── */
-#screen-listening { gap: 24px; padding-top: 0; justify-content: center; }
-@keyframes lp { 0%{transform:scale(1);opacity:.45;} 100%{transform:scale(1.5);opacity:0;} }
-.listen-wrap { position: relative; width: 110px; height: 110px; display: flex; align-items: center; justify-content: center; }
-.lr { position: absolute; inset: 0; border-radius: 50%; background: var(--gold); opacity: 0; animation: lp 1.2s ease-out infinite; }
-.lr.d { animation-delay: .6s; }
-.mic-circle { width: 80px; height: 80px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 2.2rem; color: #1a1000; position: relative; z-index: 1; }
+#screen-listening{gap:24px;padding-top:0;justify-content:center;}
+@keyframes lp{0%{transform:scale(1);opacity:.4;}100%{transform:scale(1.5);opacity:0;}}
+.listen-wrap{position:relative;width:110px;height:110px;display:flex;align-items:center;justify-content:center;}
+.lr{position:absolute;inset:0;border-radius:50%;background:var(--gold);opacity:0;animation:lp 1.2s ease-out infinite;}
+.lr.d{animation-delay:.6s;}
+.mic-circle{width:82px;height:82px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:2.2rem;color:var(--gold-text);position:relative;z-index:1;}
+#voice-transcript{font-size:1rem;text-align:center;max-width:290px;color:var(--text);line-height:1.5;min-height:48px;background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;}
 
 /* ── COUNTDOWN ── */
-#screen-countdown { gap: 12px; padding-top: 0; justify-content: center; }
-.cam-preview {
-  width: 100%; max-width: 340px; aspect-ratio: 4/3;
-  border-radius: 16px; overflow: hidden; background: #000;
-  position: relative; flex-shrink: 0;
-}
-.cam-preview video {
-  width: 100%; height: 100%; object-fit: cover; display: block;
-}
-.cd-overlay {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(0,0,0,.35);
-}
-.cd-ring { position: relative; width: 130px; height: 130px; }
-.cd-ring svg { transform: rotate(-90deg); }
-.rb { fill: none; stroke: rgba(255,255,255,.2); stroke-width: 8; }
-.rf { fill: none; stroke: var(--gold); stroke-width: 8; stroke-linecap: round; stroke-dasharray: 365; transition: stroke-dashoffset .9s linear, stroke .3s; }
-.cd-num { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Space Mono', monospace; font-size: 3rem; font-weight: 700; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,.8); }
+#screen-countdown{gap:10px;padding-top:0;justify-content:center;}
+.cam-preview{width:100%;max-width:340px;aspect-ratio:4/3;border-radius:16px;overflow:hidden;background:#000;position:relative;flex-shrink:0;border:3px solid var(--border);}
+.cam-preview video{width:100%;height:100%;object-fit:cover;display:block;}
+.cd-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.35);}
+.cd-ring{position:relative;width:130px;height:130px;}
+.cd-ring svg{transform:rotate(-90deg);}
+.rb{fill:none;stroke:rgba(255,255,255,.2);stroke-width:8;}
+.rf{fill:none;stroke:var(--gold);stroke-width:8;stroke-linecap:round;stroke-dasharray:365;transition:stroke-dashoffset .9s linear,stroke .3s;}
+.cd-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:3rem;font-weight:700;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.8);}
+.cd-info{font-size:.9rem;color:var(--text2);text-align:center;max-width:280px;line-height:1.5;}
 
 /* ── ANALISI ── */
-#screen-analyzing { gap: 24px; padding-top: 0; justify-content: center; }
-.spinner { width: 72px; height: 72px; border: 6px solid #2a2a40; border-top-color: var(--gold); border-radius: 50%; animation: spin 1s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+#screen-analyzing{gap:24px;padding-top:0;justify-content:center;}
+.spinner{width:72px;height:72px;border:6px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
 
 /* ── RISULTATO ── */
-#screen-result { gap: 16px; }
-.res-badge { font-size: 3.5rem; line-height: 1; }
-.res-main { font-size: 1.4rem; font-weight: 700; color: var(--gold); text-align: center; line-height: 1.3; max-width: 320px; }
-.res-list { background: var(--surface); border-radius: var(--radius); padding: 14px 18px; width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 8px; }
-.coin-row { display: flex; align-items: center; gap: 12px; font-size: .95rem; padding: 3px 0; }
-.coin-row.hi { color: var(--gold); font-weight: 700; }
-.pos-b { width: 28px; height: 28px; border-radius: 50%; background: #2a2a40; display: flex; align-items: center; justify-content: center; font-family: 'Space Mono', monospace; font-size: .75rem; flex-shrink: 0; }
-.coin-row.hi .pos-b { background: var(--gold); color: #1a1000; }
-.act-row { display: flex; gap: 12px; width: 100%; max-width: 360px; }
-.btn-sec { background: var(--surface); color: var(--text); border: 2px solid #333; border-radius: var(--radius); padding: 13px 20px; font-family: 'Lexend', sans-serif; font-size: .95rem; cursor: pointer; flex: 1; }
-.act-row .btn-gold { flex: 1; }
+#screen-result{gap:14px;}
+.res-badge{font-size:3.5rem;line-height:1;}
+.res-main{font-size:1.3rem;font-weight:700;color:var(--gold);text-align:center;line-height:1.35;max-width:340px;}
+.res-list{background:var(--surface);border:2px solid var(--border);border-radius:var(--radius);padding:14px 18px;width:100%;max-width:380px;display:flex;flex-direction:column;gap:8px;}
+.coin-row{display:flex;align-items:center;gap:12px;font-size:.95rem;padding:3px 0;color:var(--text);}
+.coin-row.hi{color:var(--gold);font-weight:700;}
+.pos-b{width:30px;height:30px;border-radius:50%;background:var(--surface2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:.75rem;flex-shrink:0;color:var(--text2);}
+.coin-row.hi .pos-b{background:var(--gold);border-color:var(--gold-dark);color:var(--gold-text);}
+
+/* ── CONFERMA ── */
+#screen-confirm{gap:20px;padding-top:0;justify-content:center;}
+.conf-box{background:var(--surface);border:2px solid var(--border);border-radius:var(--radius);padding:20px;width:100%;max-width:380px;text-align:center;}
+.conf-badge{font-size:3rem;margin-bottom:12px;}
+.conf-msg{font-size:1.1rem;font-weight:600;color:var(--text);line-height:1.6;margin-bottom:6px;}
+.conf-q{font-size:.9rem;color:var(--muted);margin-top:8px;}
 
 /* ── ERRORE ── */
-#screen-error { gap: 20px; padding-top: 0; justify-content: center; }
-.err-msg { font-size: 1.05rem; color: var(--danger); text-align: center; max-width: 300px; line-height: 1.5; }
+#screen-error{gap:20px;padding-top:0;justify-content:center;}
+.err-msg{font-size:1.05rem;color:var(--danger);text-align:center;max-width:310px;line-height:1.5;background:rgba(224,85,85,.08);border:2px solid rgba(224,85,85,.3);border-radius:var(--radius-sm);padding:14px;}
 
 /* ── MISC ── */
-.label-sm { font-size: .88rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
-.target-lbl { font-size: 1.3rem; font-weight: 700; color: var(--gold); }
-.hint { font-size: .88rem; color: var(--muted); text-align: center; max-width: 280px; line-height: 1.5; }
-.cancel-btn { background: transparent; border: 2px solid #333; border-radius: 50px; padding: 11px 30px; color: var(--muted); font-family: 'Lexend', sans-serif; font-size: .88rem; cursor: pointer; }
+.label-sm{font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;text-align:center;}
+.target-lbl{font-size:1.3rem;font-weight:700;color:var(--gold);}
 
 /* ── BANNER AGGIORNAMENTO ── */
-#update-banner {
-  display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 999;
-  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
-  color: #1a1000; padding: 14px 20px;
-  flex-direction: row; align-items: center; justify-content: space-between; gap: 12px;
-  font-family: 'Lexend', sans-serif; font-size: .9rem; font-weight: 700;
-  box-shadow: 0 -4px 20px rgba(0,0,0,.4);
+#update-banner{
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;
+  background:linear-gradient(135deg,var(--gold-dark),var(--gold));
+  color:var(--gold-text);padding:14px 20px;
+  flex-direction:row;align-items:center;justify-content:space-between;gap:12px;
+  font-family:'Lexend',sans-serif;font-size:.9rem;font-weight:700;
+  box-shadow:0 -4px 20px rgba(0,0,0,.4);
 }
-#update-banner button {
-  background: #1a1000; color: var(--gold); border: none; border-radius: 10px;
-  padding: 8px 16px; font-family: 'Lexend', sans-serif; font-size: .85rem; font-weight: 700; cursor: pointer;
+#update-banner button{
+  background:var(--gold-text);color:var(--gold);border:none;border-radius:10px;
+  padding:8px 16px;font-family:'Lexend',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;
 }
 
-[aria-live] { position: absolute; left: -9999px; }
-button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+[aria-live]{position:absolute;left:-9999px;}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:2px;}
 </style>
 </head>
 <body>
 <div aria-live="polite" id="lr"></div>
 <canvas id="canvas" style="display:none"></canvas>
 
-<!-- BANNER AGGIORNAMENTO -->
 <div id="update-banner">
   <span>🆕 Aggiornamento disponibile!</span>
-  <button onclick="window.location.reload()">Aggiorna ora</button>
+  <button onclick="window.location.reload(true)">Aggiorna ora</button>
 </div>
 
-<!-- TOPBAR -->
 <div id="topbar">
+  <button class="icon-btn" id="btn-theme" aria-label="Cambia tema" title="Tema chiaro/scuro">🌙</button>
   <button class="icon-btn" id="btn-settings-open" aria-label="Impostazioni">⚙️</button>
 </div>
 
@@ -290,15 +289,14 @@ button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 <div class="screen" id="screen-home">
   <p class="app-title">🔍 CercaMoneta</p>
   <div class="voice-wrap">
-    <div class="pr"></div>
-    <div class="pr d"></div>
+    <div class="pr"></div><div class="pr d"></div>
     <button class="big-voice-btn" id="btn-voice" aria-label="Premi per dire la moneta da cercare">
       <span class="mic-icon">🎙️</span>
       <span class="mic-label">Premi e parla</span>
     </button>
   </div>
   <button class="manual-link" id="btn-go-manual">oppure scegli a mano</button>
-  <span class="ver">v1.0.0.1</span>
+  <span class="ver">v1.0.0.3</span>
 </div>
 
 <!-- ══ SELEZIONE MANUALE ══ -->
@@ -325,7 +323,6 @@ button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
     <button class="back-btn" id="btn-back-settings" aria-label="Chiudi">←</button>
     <span class="settings-title">Impostazioni</span>
   </div>
-
   <div class="tab-bar">
     <button class="tab-btn active" data-tab="tab-api"><span class="ti">🔑</span>API Key</button>
     <button class="tab-btn" data-tab="tab-perm"><span class="ti">🎙️</span>Permessi</button>
@@ -334,7 +331,6 @@ button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
     <button class="tab-btn" data-tab="tab-app"><span class="ti">📱</span>App</button>
   </div>
 
-  <!-- TAB API KEY -->
   <div class="tab-panel active" id="tab-api">
     <div class="card">
       <div class="card-title">🔑 API Key Anthropic</div>
@@ -349,58 +345,48 @@ button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
     </div>
   </div>
 
-  <!-- TAB PERMESSI -->
   <div class="tab-panel" id="tab-perm">
     <div class="card">
       <div class="card-title">🎙️ Microfono e fotocamera</div>
       <p class="card-desc">Premi i pulsanti per autorizzare l'accesso. Se il popup non appare vai in Chrome → Impostazioni sito.</p>
-      <div class="perm-row">
-        <span class="perm-label">🎙️ Microfono</span>
-        <button class="perm-btn" id="btn-perm-mic">Verifica</button>
-      </div>
-      <div class="perm-row">
-        <span class="perm-label">📷 Fotocamera</span>
-        <button class="perm-btn" id="btn-perm-cam">Verifica</button>
-      </div>
+      <div class="perm-row"><span class="perm-label">🎙️ Microfono</span><button class="perm-btn" id="btn-perm-mic">Verifica</button></div>
+      <div class="perm-row"><span class="perm-label">📷 Fotocamera</span><button class="perm-btn" id="btn-perm-cam">Verifica</button></div>
     </div>
   </div>
 
-  <!-- TAB AUDIO/VIDEO -->
   <div class="tab-panel" id="tab-av">
     <div class="card">
       <div class="card-title">🔊 Voce sintetizzatore</div>
       <p class="card-desc">Scegli la voce e la velocità di lettura.</p>
-      <select id="sel-voice" class="api-input" style="padding:12px 14px;cursor:pointer"></select>
-      <div class="perm-row" style="align-items:center;gap:16px">
+      <select id="sel-voice" class="api-input" style="padding:12px 14px"></select>
+      <div class="perm-row">
         <span class="perm-label" style="white-space:nowrap">Velocità</span>
         <input type="range" id="range-rate" min="0.5" max="2" step="0.1" value="1" style="flex:1;accent-color:var(--gold)">
-        <span id="rate-val" style="font-family:monospace;color:var(--gold);min-width:30px">1.0</span>
+        <span id="rate-val" style="font-family:monospace;color:var(--gold);min-width:30px;text-align:right">1.0</span>
       </div>
       <button class="btn-gold" id="btn-test-voice">▶ Ascolta voce</button>
     </div>
     <div class="card">
       <div class="card-title">📷 Fotocamera</div>
-      <p class="card-desc">Scegli quale fotocamera usare per inquadrare le monete.</p>
-      <select id="sel-cam" class="api-input" style="padding:12px 14px;cursor:pointer">
+      <p class="card-desc">Scegli quale fotocamera usare.</p>
+      <select id="sel-cam" class="api-input" style="padding:12px 14px">
         <option value="environment">Posteriore (default)</option>
         <option value="user">Frontale</option>
       </select>
-      <button class="btn-gold" id="btn-save-av">Salva impostazioni audio/video</button>
+      <button class="btn-gold" id="btn-save-av">Salva impostazioni</button>
     </div>
   </div>
 
-  <!-- TAB AGGIORNAMENTI -->
   <div class="tab-panel" id="tab-upd">
     <div class="card">
       <div class="card-title">🔄 Aggiornamenti</div>
-      <p class="card-desc">Versione installata: <strong>v1.0.0.1</strong></p>
+      <p class="card-desc">Versione installata: <strong>v1.0.0.3</strong></p>
       <p class="card-desc">L'app controlla automaticamente all'avvio. Se c'è una versione nuova apparirà un banner in basso.</p>
       <button class="btn-gold" id="btn-check-upd">Controlla ora</button>
       <p id="upd-status" class="note"></p>
     </div>
   </div>
 
-  <!-- TAB APP -->
   <div class="tab-panel" id="tab-app">
     <div class="card">
       <div class="card-title">📱 Disinstallazione</div>
@@ -418,12 +404,8 @@ button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 <!-- ══ ASCOLTO ══ -->
 <div class="screen hidden" id="screen-listening">
   <p class="label-sm">In ascolto…</p>
-  <div class="listen-wrap">
-    <div class="lr"></div>
-    <div class="lr d"></div>
-    <div class="mic-circle">🎙️</div>
-  </div>
-  <p id="voice-transcript" style="font-size:1.05rem;text-align:center;max-width:280px">Di' il valore della moneta…</p>
+  <div class="listen-wrap"><div class="lr"></div><div class="lr d"></div><div class="mic-circle">🎙️</div></div>
+  <div id="voice-transcript">Di' il valore della moneta…</div>
   <button class="cancel-btn" id="btn-cancel-voice">Annulla</button>
 </div>
 
@@ -443,7 +425,7 @@ button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
       </div>
     </div>
   </div>
-  <p class="hint">Inquadra le monete in fila da sinistra a destra</p>
+  <p class="cd-info">Inquadra le monete in fila da sinistra a destra</p>
   <button class="cancel-btn" id="btn-cancel-cd">Annulla</button>
 </div>
 
@@ -466,11 +448,13 @@ button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 
 <!-- ══ CONFERMA ══ -->
 <div class="screen hidden" id="screen-confirm">
-  <div class="res-badge" id="conf-badge">🪙</div>
-  <p class="res-main" id="conf-msg" style="text-align:center;max-width:340px;line-height:1.4"></p>
-  <p style="font-size:.9rem;color:var(--muted);text-align:center">Hai capito?</p>
-  <div class="act-row" style="max-width:340px">
-    <button class="btn-gold" id="btn-conf-yes">✅ Sì, ho capito</button>
+  <div class="conf-box">
+    <div class="conf-badge" id="conf-badge">🪙</div>
+    <p class="conf-msg" id="conf-msg"></p>
+    <p class="conf-q">Hai capito?</p>
+  </div>
+  <div class="act-row">
+    <button class="btn-gold" id="btn-conf-yes">✅ Sì, capito</button>
     <button class="btn-sec" id="btn-conf-no">🔄 Ripeti</button>
   </div>
 </div>
@@ -479,79 +463,140 @@ button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 <div class="screen hidden" id="screen-error" role="alert">
   <div style="font-size:3rem">⚠️</div>
   <p class="err-msg" id="err-msg"></p>
-  <button class="btn-gold" id="btn-err-home" style="max-width:220px">Torna all'inizio</button>
+  <button class="btn-gold" id="btn-err-home" style="max-width:240px">Torna all'inizio</button>
 </div>
 
 <script>
 // ══ COSTANTI ══
-const CD = 5;
-const LABELS = {1:'1 centesimo',2:'2 centesimi',5:'5 centesimi',10:'10 centesimi',20:'20 centesimi',50:'50 centesimi',100:'1 euro',200:'2 euro'};
-const VALS = [200,100,50,20,10,5,2,1]; // ordine decrescente per greedy
-const KW = {
-  'due euro':200,'2 euro':200,'2,00':200,
-  'un euro':100,'1 euro':100,'uno euro':100,'1,00':100,'euro':100,
-  'cinquanta centesimi':50,'50 centesimi':50,'mezzo euro':50,'cinquanta':50,'0,50':50,'0,5':50,'50 cent':50,
-  'venti centesimi':20,'20 centesimi':20,'venti':20,'0,20':20,'20 cent':20,
-  'dieci centesimi':10,'10 centesimi':10,'dieci':10,'0,10':10,'10 cent':10,
-  'cinque centesimi':5,'5 centesimi':5,'cinque':5,'0,05':5,'5 cent':5,
-  'due centesimi':2,'2 centesimi':2,'0,02':2,'2 cent':2,
-  'un centesimo':1,'1 centesimo':1,'0,01':1,'1 cent':1
-};
+const CD=5;
+// Mappa valore (centesimi) → label
+const LABELS={1:'1 centesimo',2:'2 centesimi',5:'5 centesimi',10:'10 centesimi',20:'20 centesimi',50:'50 centesimi',100:'1 euro',200:'2 euro'};
+// Valori in ordine decrescente per greedy
+const VALS=[200,100,50,20,10,5,2,1];
+
+// ══ RICONOSCIMENTO VOCALE — mappa ESATTA ══
+// Ogni entry: [pattern_regex, valore_centesimi]
+// Ordinate dalla più specifica alla più generica
+const VOICE_PATTERNS = [
+  // 2 euro — deve matchare PRIMA di "euro" da solo
+  [/\bdue\s*euro\b/,'200'],
+  [/\b2\s*euro\b/,'200'],
+  [/\bdue\b/,'200'], // "due" da solo → 2 euro (contesto monete)
+
+  // 1 euro
+  [/\bun\s*euro\b/,'100'],
+  [/\buno\s*euro\b/,'100'],
+  [/\b1\s*euro\b/,'100'],
+
+  // 50 centesimi
+  [/\bcinquanta\s*centesimi\b/,'50'],
+  [/\b50\s*centesimi\b/,'50'],
+  [/\bmezzo\s*euro\b/,'50'],
+  [/\bcinquanta\b/,'50'],
+  [/\b0[,.]5\b/,'50'],
+  [/\b50\b/,'50'],
+
+  // 20 centesimi
+  [/\bventi\s*centesimi\b/,'20'],
+  [/\b20\s*centesimi\b/,'20'],
+  [/\bventi\b/,'20'],
+  [/\b0[,.]2\b/,'20'],
+  [/\b20\b/,'20'],
+
+  // 10 centesimi
+  [/\bdieci\s*centesimi\b/,'10'],
+  [/\b10\s*centesimi\b/,'10'],
+  [/\bdieci\b/,'10'],
+  [/\b0[,.]1\b/,'10'],
+  [/\b10\b/,'10'],
+
+  // 5 centesimi
+  [/\bcinque\s*centesimi\b/,'5'],
+  [/\b5\s*centesimi\b/,'5'],
+  [/\bcinque\b/,'5'],
+  [/\b0[,.]05\b/,'5'],
+
+  // 2 centesimi
+  [/\bdue\s*centesimi\b/,'2'],
+  [/\b2\s*centesimi\b/,'2'],
+  [/\b0[,.]02\b/,'2'],
+
+  // 1 centesimo
+  [/\bun\s*centesimo\b/,'1'],
+  [/\buno\s*centesimo\b/,'1'],
+  [/\b1\s*centesimo\b/,'1'],
+  [/\b0[,.]01\b/,'1'],
+
+  // Fallback: "euro" da solo → 1 euro
+  [/\beuro\b/,'100'],
+];
+
+function parseVoice(rawText) {
+  const t = rawText.toLowerCase().trim();
+  for (const [pattern, val] of VOICE_PATTERNS) {
+    if (pattern.test(t)) return parseInt(val);
+  }
+  return null;
+}
+
+// ══ GREEDY: combinazione con meno monete ══
+function greedyCombo(targetCents, availCents) {
+  const pool = [...availCents].sort((a,b)=>b-a);
+  let remaining = targetCents;
+  const used = [];
+  for (const v of pool) {
+    if (remaining >= v) { used.push(v); remaining -= v; }
+    if (remaining === 0) break;
+  }
+  return remaining === 0 ? used : null;
+}
 
 // ══ STATO ══
-let tVal=null, tLabel='', stream=null, cdInt=null, audio=null, rec=null, prev='screen-home', swReg=null;
-let confirmMsg='', confirmBadge=''; // per schermata conferma
+let tVal=null, tLabel='', camStream=null, cdInt=null, audioCtx=null, rec=null;
+let prev='screen-home', swReg=null, confirmTxt='', confirmBadge='🪙';
 
 // ══ UTILS ══
 const $=id=>document.getElementById(id);
 
 function getRate(){ return parseFloat(localStorage.getItem('cm_rate')||'1'); }
 function getVoiceName(){ return localStorage.getItem('cm_voice')||''; }
-function getCamFacing(){ return localStorage.getItem('cm_cam')||'environment'; }
+function getCam(){ return localStorage.getItem('cm_cam')||'environment'; }
+function getKey(){ return localStorage.getItem('cm_key')||''; }
+function saveKey(k){ localStorage.setItem('cm_key',k.trim()); }
 
-function speak(txt, interrupt=true){
-  if(!('speechSynthesis' in window)) return;
-  if(interrupt) speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(txt);
-  u.lang='it-IT'; u.rate=getRate();
-  const vname=getVoiceName();
-  if(vname){
-    const voices=speechSynthesis.getVoices();
-    const v=voices.find(x=>x.name===vname);
-    if(v) u.voice=v;
-  }
-  speechSynthesis.speak(u);
-  $('lr').textContent=txt;
+function speak(txt, onEnd){
+  if(!('speechSynthesis' in window)) { if(onEnd) onEnd(); return; }
+  speechSynthesis.cancel();
+  setTimeout(()=>{
+    const u=new SpeechSynthesisUtterance(txt);
+    u.lang='it-IT'; u.rate=getRate();
+    const vn=getVoiceName();
+    if(vn){ const v=speechSynthesis.getVoices().find(x=>x.name===vn); if(v) u.voice=v; }
+    if(onEnd) u.onend=onEnd;
+    speechSynthesis.speak(u);
+    $('lr').textContent=txt;
+  },50);
 }
 
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
   $(id).classList.remove('hidden');
   const noTop=['screen-listening','screen-countdown','screen-analyzing','screen-result','screen-confirm','screen-error'];
-  $('topbar').style.display = noTop.includes(id) ? 'none' : 'flex';
+  $('topbar').className = noTop.includes(id) ? 'off' : '';
 }
 
-// ══ GREEDY: trova combinazione con meno monete per fare il totale ══
-function greedyCombination(targetCents, availableCoins){
-  // availableCoins: array di valori in centesimi (es [100,50,20])
-  // Restituisce array di valori usati o null se impossibile
-  const counts = {};
-  VALS.forEach(v=>{ counts[v]=(availableCoins.filter(x=>x===v).length); });
-  let remaining = targetCents;
-  const used = [];
-  for(const v of VALS){
-    while(remaining>=v && counts[v]>0){
-      used.push(v); counts[v]--; remaining-=v;
-    }
-    if(remaining===0) break;
-  }
-  return remaining===0 ? used : null;
+// ══ TEMA ══
+function applyTheme(light){
+  document.body.classList.toggle('light', light);
+  $('btn-theme').textContent = light ? '🌙' : '☀️';
+  $('btn-theme').title = light ? 'Passa al tema scuro' : 'Passa al tema chiaro';
+  localStorage.setItem('cm_theme', light?'light':'dark');
 }
-
-// Converte valore numerico (centesimi) in label
-function valToLabel(v){
-  return LABELS[v]||`${v} cent`;
-}
+$('btn-theme').addEventListener('click',()=>{
+  applyTheme(!document.body.classList.contains('light'));
+});
+// Applica tema salvato all'avvio
+applyTheme(localStorage.getItem('cm_theme')==='light');
 
 // ══ NAVIGAZIONE ══
 $('btn-go-manual').addEventListener('click',()=>showScreen('screen-manual'));
@@ -559,152 +604,120 @@ $('btn-back-manual').addEventListener('click',()=>showScreen('screen-home'));
 
 // ══ IMPOSTAZIONI ══
 $('btn-settings-open').addEventListener('click',()=>{
-  prev = document.querySelector('.screen:not(.hidden)')?.id||'screen-home';
-  $('api-key-input').value = getKey();
-  updateStatus();
-  populateVoices();
-  populateCams();
+  prev=document.querySelector('.screen:not(.hidden)')?.id||'screen-home';
+  $('api-key-input').value=getKey(); updateStatus();
+  populateVoices(); populateCams();
   showScreen('screen-settings');
 });
 $('btn-back-settings').addEventListener('click',()=>showScreen(prev));
 
-// tab switching
 document.querySelectorAll('.tab-btn').forEach(b=>{
   b.addEventListener('click',()=>{
     document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
     document.querySelectorAll('.tab-panel').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active');
-    $(b.dataset.tab).classList.add('active');
+    b.classList.add('active'); $(b.dataset.tab).classList.add('active');
   });
 });
 
-// salva key
 $('btn-save-key').addEventListener('click',()=>{
   const v=$('api-key-input').value.trim();
   if(!v){ speak('Campo vuoto.'); return; }
   saveKey(v); updateStatus(); speak('Chiave salvata.');
-  setTimeout(()=>showScreen(prev),900);
+  setTimeout(()=>showScreen(prev),1000);
 });
-$('btn-eye').addEventListener('click',()=>{
-  const i=$('api-key-input'); i.type=i.type==='password'?'text':'password';
-});
+$('btn-eye').addEventListener('click',()=>{ const i=$('api-key-input'); i.type=i.type==='password'?'text':'password'; });
 
-// permessi
 $('btn-perm-mic').addEventListener('click',async()=>{
   const b=$('btn-perm-mic');
-  try{
-    const s=await navigator.mediaDevices.getUserMedia({audio:true});
-    s.getTracks().forEach(t=>t.stop());
-    b.textContent='✓ OK'; b.className='perm-btn ok'; speak('Microfono autorizzato.');
-  }catch(e){ b.textContent='✗ Negato'; b.className='perm-btn no'; speak('Microfono negato.'); }
+  try{ const s=await navigator.mediaDevices.getUserMedia({audio:true}); s.getTracks().forEach(t=>t.stop()); b.textContent='✓ OK'; b.className='perm-btn ok'; speak('Microfono autorizzato.'); }
+  catch(e){ b.textContent='✗ Negato'; b.className='perm-btn no'; speak('Microfono negato.'); }
 });
 $('btn-perm-cam').addEventListener('click',async()=>{
   const b=$('btn-perm-cam');
-  try{
-    const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
-    s.getTracks().forEach(t=>t.stop());
-    b.textContent='✓ OK'; b.className='perm-btn ok'; speak('Fotocamera autorizzata.');
-  }catch(e){ b.textContent='✗ Negato'; b.className='perm-btn no'; speak('Fotocamera negata.'); }
+  try{ const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}); s.getTracks().forEach(t=>t.stop()); b.textContent='✓ OK'; b.className='perm-btn ok'; speak('Fotocamera autorizzata.'); }
+  catch(e){ b.textContent='✗ Negato'; b.className='perm-btn no'; speak('Fotocamera negata.'); }
 });
 
-// ── Voci sintetizzatore ──
 function populateVoices(){
-  const sel=$('sel-voice');
-  const voices=speechSynthesis.getVoices();
-  const saved=getVoiceName();
-  sel.innerHTML='<option value="">-- Voce predefinita --</option>';
-  voices.filter(v=>v.lang.startsWith('it')||v.lang.startsWith('IT')).forEach(v=>{
-    const o=document.createElement('option');
-    o.value=v.name; o.textContent=v.name+(v.localService?' (locale)':' (online)');
-    if(v.name===saved) o.selected=true;
-    sel.appendChild(o);
-  });
-  // Se nessuna voce italiana, mostra tutte
-  if(sel.options.length<=1){
-    voices.forEach(v=>{
-      const o=document.createElement('option');
-      o.value=v.name; o.textContent=`${v.name} (${v.lang})`;
-      if(v.name===saved) o.selected=true;
-      sel.appendChild(o);
-    });
+  const sel=$('sel-voice'), saved=getVoiceName();
+  $('range-rate').value=getRate(); $('rate-val').textContent=getRate().toFixed(1);
+
+  function fill(){
+    const voices=speechSynthesis.getVoices();
+    if(voices.length===0) return false; // non ancora pronte
+    sel.innerHTML='<option value="">-- Voce predefinita (Google IT) --</option>';
+    // Prima le voci italiane, poi tutte le altre
+    const itVoices=voices.filter(v=>v.lang.toLowerCase().startsWith('it'));
+    const otherVoices=voices.filter(v=>!v.lang.toLowerCase().startsWith('it'));
+    if(itVoices.length>0){
+      const grp=document.createElement('optgroup'); grp.label='Italiano';
+      itVoices.forEach(v=>{ const o=document.createElement('option'); o.value=v.name; o.textContent=v.name+(v.localService?' 📱':' 🌐'); if(v.name===saved)o.selected=true; grp.appendChild(o); });
+      sel.appendChild(grp);
+    }
+    if(otherVoices.length>0){
+      const grp=document.createElement('optgroup'); grp.label='Altre lingue';
+      otherVoices.forEach(v=>{ const o=document.createElement('option'); o.value=v.name; o.textContent=`${v.name} (${v.lang})`+(v.localService?' 📱':' 🌐'); if(v.name===saved)o.selected=true; grp.appendChild(o); });
+      sel.appendChild(grp);
+    }
+    if(itVoices.length===0 && otherVoices.length===0){
+      sel.innerHTML='<option value="">Nessuna voce trovata — usa il default</option>';
+    }
+    return true;
   }
-  // Velocità
-  $('range-rate').value=getRate();
-  $('rate-val').textContent=getRate().toFixed(1);
+
+  // Su Android Chrome le voci arrivano in modo asincrono
+  if(!fill()){
+    speechSynthesis.onvoiceschanged=()=>{ fill(); speechSynthesis.onvoiceschanged=null; };
+    // Fallback: riprova dopo 1 secondo
+    setTimeout(()=>{ if($('sel-voice').options.length<=1) fill(); }, 1000);
+  }
 }
-$('range-rate').addEventListener('input',()=>{
-  $('rate-val').textContent=parseFloat($('range-rate').value).toFixed(1);
-});
+$('range-rate').addEventListener('input',()=>{ $('rate-val').textContent=parseFloat($('range-rate').value).toFixed(1); });
 $('btn-test-voice').addEventListener('click',()=>{
-  const v=$('sel-voice').value;
-  if(v) localStorage.setItem('cm_voice',v);
+  const v=$('sel-voice').value; if(v) localStorage.setItem('cm_voice',v); else localStorage.removeItem('cm_voice');
   localStorage.setItem('cm_rate',$('range-rate').value);
   speak('Questa è la voce selezionata. Come suona?');
 });
 
-// ── Fotocamera ──
 async function populateCams(){
-  const sel=$('sel-cam');
-  const saved=getCamFacing();
+  const sel=$('sel-cam'), saved=getCam();
   try{
     const devs=await navigator.mediaDevices.enumerateDevices();
     const cams=devs.filter(d=>d.kind==='videoinput');
-    if(cams.length>0){
+    if(cams.length>1){
       sel.innerHTML='';
       cams.forEach((cam,i)=>{
-        const o=document.createElement('option');
-        // Cerca di capire se è frontale o posteriore dal label
         const lbl=cam.label.toLowerCase();
-        const isFront=lbl.includes('front')||lbl.includes('user')||lbl.includes('selfie')||lbl.includes('facetime');
-        o.value=cam.deviceId;
-        o.textContent=cam.label||`Fotocamera ${i+1}`;
-        o.dataset.facing=isFront?'user':'environment';
-        if((saved===cam.deviceId)||(saved==='environment'&&!isFront&&i===0)) o.selected=true;
+        const front=lbl.includes('front')||lbl.includes('user')||lbl.includes('selfie')||lbl.includes('facetime');
+        const o=document.createElement('option');
+        o.value=cam.deviceId; o.textContent=cam.label||`Fotocamera ${i+1}`;
+        if(cam.deviceId===saved||(saved==='environment'&&!front&&i===0)) o.selected=true;
         sel.appendChild(o);
       });
     }
-  }catch(e){ /* usa default */ }
+  }catch(e){}
 }
-
 $('btn-save-av').addEventListener('click',()=>{
-  const selV=$('sel-voice'), selC=$('sel-cam');
-  if(selV.value) localStorage.setItem('cm_voice',selV.value);
-  else localStorage.removeItem('cm_voice');
+  const sv=$('sel-voice').value, sc=$('sel-cam');
+  if(sv) localStorage.setItem('cm_voice',sv); else localStorage.removeItem('cm_voice');
   localStorage.setItem('cm_rate',$('range-rate').value);
-  // Salva deviceId o facing mode
-  const opt=selC.options[selC.selectedIndex];
-  if(opt && opt.value && opt.value!=='environment' && opt.value!=='user'){
-    localStorage.setItem('cm_cam', opt.value); // deviceId specifico
-  } else {
-    localStorage.setItem('cm_cam', opt?opt.value:'environment');
-  }
+  const opt=sc.options[sc.selectedIndex];
+  localStorage.setItem('cm_cam', opt ? opt.value : 'environment');
   speak('Impostazioni audio e video salvate.');
-  setTimeout(()=>showScreen(prev),900);
+  setTimeout(()=>showScreen(prev),1000);
 });
 
-// aggiornamenti
 $('btn-check-upd').addEventListener('click',()=>{
   const s=$('upd-status'); s.textContent='Controllo in corso…';
-  if(swReg){ swReg.update().then(()=>{ setTimeout(()=>{ s.textContent='Sei già alla versione più recente.'; },2000); }); }
+  if(swReg){ swReg.update().then(()=>setTimeout(()=>{ s.textContent='Sei già alla versione più recente.'; },2000)); }
   else { s.textContent='Service worker non disponibile.'; }
 });
-$('btn-uninstall').addEventListener('click',()=>{
-  speak('Tieni premuta l\'icona dell\'app sulla schermata home, poi seleziona Disinstalla.');
-  alert('Tieni premuta l\'icona di CercaMoneta → seleziona Disinstalla.');
-});
-$('btn-clear-data').addEventListener('click',()=>{
-  if(!confirm('Cancellare API key e tutte le impostazioni?')) return;
-  localStorage.clear(); updateStatus(); speak('Dati cancellati.');
-});
+$('btn-uninstall').addEventListener('click',()=>{ speak('Tieni premuta l\'icona dell\'app sulla schermata home, poi seleziona Disinstalla.'); alert('Tieni premuta l\'icona di CercaMoneta → seleziona Disinstalla.'); });
+$('btn-clear-data').addEventListener('click',()=>{ if(!confirm('Cancellare API key e tutte le impostazioni?')) return; localStorage.clear(); updateStatus(); speak('Dati cancellati.'); });
 
-// ══ API KEY ══
-const getKey=()=>localStorage.getItem('cm_key')||'';
-const saveKey=k=>localStorage.setItem('cm_key',k.trim());
 function updateStatus(){
   const k=getKey(), ok=k&&k.startsWith('sk-ant-');
-  $('api-status').innerHTML=k
-    ?`<span class="pill ${ok?'ok':'no'}"><span class="pill-dot"></span>${ok?'Chiave attiva':'Formato non riconosciuto'}</span>`
-    :'<span class="pill no"><span class="pill-dot"></span>Nessuna chiave inserita</span>';
+  $('api-status').innerHTML=k?`<span class="pill ${ok?'ok':'no'}"><span class="pill-dot"></span>${ok?'Chiave attiva':'Formato non riconosciuto'}</span>`:'<span class="pill no"><span class="pill-dot"></span>Nessuna chiave inserita</span>';
 }
 function needKey(){
   if(getKey()) return true;
@@ -714,25 +727,22 @@ function needKey(){
 }
 
 // ══ AUDIO ══
-function initAudio(){ if(!audio) audio=new(window.AudioContext||window.webkitAudioContext)(); }
+function initAudio(){ if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)(); }
 function beep(f=880,d=80,v=0.4){
-  if(!audio) return;
-  const o=audio.createOscillator(),g=audio.createGain();
-  o.connect(g); g.connect(audio.destination);
-  o.frequency.value=f;
-  g.gain.setValueAtTime(v,audio.currentTime);
-  g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+d/1000);
-  o.start(); o.stop(audio.currentTime+d/1000);
+  if(!audioCtx) return;
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.connect(g); g.connect(audioCtx.destination);
+  o.frequency.value=f; g.gain.setValueAtTime(v,audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+d/1000);
+  o.start(); o.stop(audioCtx.currentTime+d/1000);
 }
 function winSound(){ beep(523,120); setTimeout(()=>beep(659,120),130); setTimeout(()=>beep(784,200),260); }
 function vib(p=[200]){ if('vibrate' in navigator) navigator.vibrate(p); }
 
-// ══ VOCE ══
+// ══ VOCE — input ══
 $('btn-voice').addEventListener('click',()=>{
   initAudio(); if(!needKey()) return;
-  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){
-    showErr('Riconoscimento vocale non supportato. Usa Chrome su Android.'); return;
-  }
+  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){ showErr('Riconoscimento vocale non supportato. Usa Chrome su Android.'); return; }
   showScreen('screen-listening');
   setTimeout(startRec, 700);
 });
@@ -741,46 +751,40 @@ $('btn-cancel-voice').addEventListener('click',()=>{ if(rec){rec.abort();rec=nul
 function startRec(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   rec=new SR(); rec.lang='it-IT'; rec.continuous=false; rec.interimResults=true; rec.maxAlternatives=5;
+
   rec.onresult=e=>{
-    const txts=[];
-    for(let i=0;i<e.results.length;i++) for(let j=0;j<e.results[i].length;j++) txts.push(e.results[i][j].transcript.toLowerCase().trim());
-    $('voice-transcript').textContent=`"${txts[0]||''}"`;
+    // Raccoglie TUTTE le trascrizioni da tutte le alternatives
+    const allTexts=[];
+    for(let i=0;i<e.results.length;i++)
+      for(let j=0;j<e.results[i].length;j++)
+        allTexts.push(e.results[i][j].transcript.toLowerCase().trim());
+
+    // Mostra la trascrizione principale
+    $('voice-transcript').textContent = allTexts[0] ? `"${allTexts[0]}"` : 'In ascolto…';
+
     if(e.results[e.results.length-1].isFinal){
-      let val=null;
-      for(const t of txts){ val=parseKW(t); if(val) break; }
-      if(val){
-        tVal=val; tLabel=LABELS[val];
+      // Prova TUTTE le alternative finché non trova un match
+      let found=null;
+      for(const txt of allTexts){
+        found=parseVoice(txt);
+        if(found) break;
+      }
+
+      if(found){
+        tVal=found; tLabel=LABELS[found];
         if(rec){rec.abort();rec=null;}
-        speak(`${tLabel}.`);
-        setTimeout(startCD, 900);
+        speak(`Cercherò: ${tLabel}.`);
+        setTimeout(startCD, 1000);
       } else {
-        $('voice-transcript').textContent=`Ho sentito: "${txts[0]||''}" — riprova`;
-        speak('Non ho capito. Di\' ad esempio: un euro, cinquanta, venti.');
-        setTimeout(startRec, 2200);
+        // Mostra cosa ha sentito
+        $('voice-transcript').textContent=`Ho sentito: "${allTexts[0]||''}" — riprova`;
+        speak('Non ho capito. Di\' il valore chiaramente, ad esempio: un euro, due euro, cinquanta centesimi, venti centesimi.');
+        setTimeout(startRec, 2500);
       }
     }
   };
-  rec.onerror=e=>{ if(e.error==='aborted'||e.error==='no-speech') return; speak('Errore microfono.'); showScreen('screen-home'); };
+  rec.onerror=e=>{ if(e.error==='aborted'||e.error==='no-speech') return; speak('Errore microfono. Controlla i permessi.'); showScreen('screen-home'); };
   rec.start();
-}
-
-function parseKW(raw){
-  let t=raw.toLowerCase().trim().replace(/[€]/g,' euro ').replace(/\s+/g,' ').trim();
-  const s=Object.entries(KW).sort((a,b)=>b[0].length-a[0].length);
-  for(const [k,v] of s){ if(t.includes(k)) return v; }
-  const nums=t.match(/\d+[.,]?\d*/g);
-  if(nums){
-    const n=parseFloat(nums[0].replace(',','.'));
-    if(n===2||n===2.00) return 200;
-    if(n===1||n===1.00) return 100;
-    if(n===0.5||n===50) return 50;
-    if(n===0.2||n===20) return 20;
-    if(n===0.1||n===10) return 10;
-    if(n===0.05||n===5) return 5;
-    if(n===0.02) return 2;
-    if(n===0.01) return 1;
-  }
-  return null;
 }
 
 // ══ MONETE MANUALI ══
@@ -788,7 +792,7 @@ document.querySelectorAll('.coin-btn').forEach(b=>{
   b.addEventListener('click',()=>{
     initAudio(); if(!needKey()) return;
     tVal=parseInt(b.dataset.value); tLabel=b.dataset.label;
-    speak(`${tLabel}.`); setTimeout(startCD,500);
+    speak(`Cercherò: ${tLabel}.`); setTimeout(startCD,600);
   });
 });
 
@@ -796,12 +800,12 @@ document.querySelectorAll('.coin-btn').forEach(b=>{
 async function startCD(){
   showScreen('screen-countdown'); $('cd-target').textContent=tLabel;
   try{
-    const camSaved=getCamFacing();
-    const constraints = camSaved && camSaved!=='environment' && camSaved!=='user'
-      ? {video:{deviceId:{exact:camSaved},width:{ideal:640},height:{ideal:480}}}
-      : {video:{facingMode:camSaved||'environment',width:{ideal:640},height:{ideal:480}}};
-    stream=await navigator.mediaDevices.getUserMedia(constraints);
-    $('video').srcObject=stream; await $('video').play();
+    const cam=getCam();
+    const constraints=(cam==='environment'||cam==='user')
+      ? {video:{facingMode:cam,width:{ideal:640},height:{ideal:480}}}
+      : {video:{deviceId:{exact:cam},width:{ideal:640},height:{ideal:480}}};
+    camStream=await navigator.mediaDevices.getUserMedia(constraints);
+    $('video').srcObject=camStream; await $('video').play();
   }catch(e){ showErr('Non riesco ad accedere alla fotocamera. Vai nelle Impostazioni → Permessi.'); return; }
 
   let s=CD;
@@ -809,56 +813,54 @@ async function startCD(){
   ring.style.strokeDasharray=circ; ring.style.strokeDashoffset=0;
   const upd=n=>{ ring.style.strokeDashoffset=circ*(1-n/CD); ring.style.stroke=n<=2?'#e05555':'var(--gold)'; };
   upd(s); $('cd-num').textContent=s; speak(`${s}`);
-
   cdInt=setInterval(()=>{
-    s--;
-    $('cd-num').textContent=s>0?s:'📷';
-    upd(Math.max(s,0));
-    beep(440+(CD-s)*80,60);
-    if(s<=0){ clearInterval(cdInt); capture(); }
-    else speak(`${s}`);
+    s--; $('cd-num').textContent=s>0?s:'📷'; upd(Math.max(s,0)); beep(440+(CD-s)*80,60);
+    if(s<=0){ clearInterval(cdInt); capture(); } else speak(`${s}`);
   },1000);
 }
 $('btn-cancel-cd').addEventListener('click',()=>{ clearInterval(cdInt); stopCam(); showScreen('screen-home'); });
 
 // ══ CATTURA ══
 function capture(){
-  showScreen('screen-analyzing'); speak('Foto scattata. Analizzo…');
+  showScreen('screen-analyzing'); speak('Foto scattata. Sto analizzando le monete.');
   const v=$('video'), c=$('canvas');
   c.width=v.videoWidth||640; c.height=v.videoHeight||480;
-  c.getContext('2d').drawImage(v,0,0);
-  stopCam();
+  c.getContext('2d').drawImage(v,0,0); stopCam();
   analyze(c.toDataURL('image/jpeg',.7).split(',')[1]);
 }
-function stopCam(){ if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; } }
+function stopCam(){ if(camStream){ camStream.getTracks().forEach(t=>t.stop()); camStream=null; } }
 
 // ══ ANALISI ══
 async function analyze(img){
-  const prompt=`Sei un assistente per non vedenti che identifica monete euro in fila su un tavolo.
-Analizza l'immagine:
-1. Individua TUTTE le monete visibili ordinate da SINISTRA a DESTRA
-2. Classifica ogni moneta con uno di questi valori ESATTI: 1 centesimo, 2 centesimi, 5 centesimi, 10 centesimi, 20 centesimi, 50 centesimi, 1 euro, 2 euro
-3. Trova la posizione di "${tLabel}" contando da 1 da sinistra
+  const prompt=`Sei un assistente visivo per non vedenti. Analizza questa immagine di monete euro disposte in fila su un tavolo.
 
-Rispondi SOLO con JSON, zero testo extra:
-{"monete":["1 euro","50 centesimi"],"valori_centesimi":[100,50],"posizione_cercata":1,"trovata":true,"messaggio":"La moneta da ${tLabel} e' la prima da sinistra"}
-Se non vedi monete: {"monete":[],"valori_centesimi":[],"posizione_cercata":-1,"trovata":false,"messaggio":"Non riesco a vedere monete chiaramente."}
-Se la moneta non c'e': {"trovata":false,"posizione_cercata":-1,"monete":["..."],"valori_centesimi":[...],"messaggio":"La moneta da ${tLabel} non e' presente."}`;
+Istruzioni:
+1. Identifica TUTTE le monete visibili, ordinate rigorosamente da SINISTRA a DESTRA
+2. Per ogni moneta usa ESATTAMENTE uno di questi valori: 1 centesimo, 2 centesimi, 5 centesimi, 10 centesimi, 20 centesimi, 50 centesimi, 1 euro, 2 euro
+3. Per ogni moneta fornisci anche il valore numerico in centesimi interi (1 centesimo=1, 2 centesimi=2, 5 centesimi=5, 10 centesimi=10, 20 centesimi=20, 50 centesimi=50, 1 euro=100, 2 euro=200)
+4. Cerca la moneta da "${tLabel}" (valore: ${tVal} centesimi) nella fila
+
+Rispondi SOLO con JSON valido, senza markdown, senza testo aggiuntivo:
+{
+  "monete": ["1 euro", "50 centesimi", "2 euro"],
+  "centesimi": [100, 50, 200],
+  "posizione_cercata": 1,
+  "trovata": true
+}
+
+Se non vedi monete chiaramente: {"monete":[],"centesimi":[],"posizione_cercata":-1,"trovata":false}
+Se la moneta cercata non c'è ma ne vedi altre: {"monete":[...],"centesimi":[...],"posizione_cercata":-1,"trovata":false}`;
 
   try{
     const r=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-opus-4-5',max_tokens:500,messages:[{role:'user',content:[
+      body:JSON.stringify({model:'claude-opus-4-5',max_tokens:400,messages:[{role:'user',content:[
         {type:'image',source:{type:'base64',media_type:'image/jpeg',data:img}},
         {type:'text',text:prompt}
       ]}]})
     });
-    if(!r.ok){
-      const e=await r.json();
-      if(r.status===401) throw new Error('API key non valida. Controllala nelle Impostazioni.');
-      throw new Error(e.error?.message||`Errore API ${r.status}`);
-    }
+    if(!r.ok){ const e=await r.json(); if(r.status===401) throw new Error('API key non valida. Controllala nelle Impostazioni.'); throw new Error(e.error?.message||`Errore API ${r.status}`); }
     const d=await r.json();
     const json=JSON.parse(d.content[0].text.trim().replace(/```json|```/g,'').trim());
     showResult(json);
@@ -866,122 +868,114 @@ Se la moneta non c'e': {"trovata":false,"posizione_cercata":-1,"monete":["..."],
 }
 
 // ══ RISULTATO ══
+const ORDINAL=['prima','seconda','terza','quarta','quinta','sesta','settima','ottava','nona','decima'];
+
+function buildFoundMsg(pos, tot, lbl){
+  const ord=ORDINAL[pos-1]||`numero ${pos}`;
+  const daSx=pos===1?'è la prima partendo da sinistra':`è la ${ord} partendo da sinistra, cioè al posto numero ${pos}`;
+  const daDx=pos===tot?', ed è anche l\'ultima da destra':(pos===tot-1?`, e da destra è la seconda`:'');
+  return `Ho trovato la moneta da ${lbl}. Si trova nella fila di ${tot} monete. La moneta che cerchi ${daSx}${daDx}. Prendila al posto numero ${pos}.`;
+}
+
+function buildComboMsg(used, lbl){
+  // Raggruppa: {100:2, 50:1} ecc
+  const grouped={};
+  used.forEach(v=>{ grouped[v]=(grouped[v]||0)+1; });
+  const parts=Object.entries(grouped).map(([v,n])=>{
+    const name=LABELS[parseInt(v)];
+    return n===1?`una moneta da ${name}`:`${n} monete da ${name}`;
+  });
+  const desc=parts.length===1?parts[0]:parts.slice(0,-1).join(', ')+' e '+parts[parts.length-1];
+  const tot=used.length;
+  return `La moneta da ${lbl} non c'è nella fila. Però puoi ottenere lo stesso importo usando in totale ${tot} moneta${tot>1?'e':''}: ${desc}. Prendi queste monete dalla fila.`;
+}
+
 function showResult(data){
   showScreen('screen-result');
-  const{trovata,posizione_cercata,monete,valori_centesimi,messaggio}=data;
+  const{trovata,posizione_cercata,monete,centesimi}=data;
+  const tot=(monete||[]).length;
 
   if(trovata && posizione_cercata>0){
-    // CASO 1: moneta trovata
-    $('res-badge').textContent='✅'; $('res-main').textContent=messaggio;
+    $('res-badge').textContent='✅';
+    const msg=buildFoundMsg(posizione_cercata, tot, tLabel);
+    $('res-main').textContent=`Moneta trovata! Posizione ${posizione_cercata} su ${tot}`;
     const l=$('res-list'); l.innerHTML='';
     (monete||[]).forEach((m,i)=>{
       const t=i+1===posizione_cercata;
-      const r=document.createElement('div');
-      r.className='coin-row'+(t?' hi':'');
+      const r=document.createElement('div'); r.className='coin-row'+(t?' hi':'');
       r.innerHTML=`<div class="pos-b">${i+1}</div><span>${m}</span>${t?' 🎯':''}`;
       l.appendChild(r);
     });
-
-    // Messaggio dettagliato per la conferma
-    const pos=posizione_cercata;
-    const tot=(monete||[]).length;
-    const ordini=['prima','seconda','terza','quarta','quinta','sesta','settima','ottava'];
-    const ord=ordini[pos-1]||`numero ${pos}`;
-    const confTxt=`La moneta da ${tLabel} è la ${ord} da sinistra, su ${tot} monete in totale. Prendila al posto numero ${pos}.`;
-    confirmMsg=confTxt;
-    confirmBadge='✅';
-
-    speak(messaggio);
+    confirmTxt=msg; confirmBadge='✅';
+    speak(msg);
     winSound(); vib([100,50,100,50,300]);
+    setTimeout(()=>showConfirm(),2200);
 
-    // Dopo 2 secondi vai alla schermata di conferma
-    setTimeout(()=>showConfirm(), 2000);
-
-  } else if((monete||[]).length>0 && (valori_centesimi||[]).length>0){
-    // CASO 2: moneta non trovata — prova combinazione greedy
-    const availCents = valori_centesimi;
-    const combination = greedyCombination(tVal, availCents);
-
-    $('res-badge').textContent='❌';
-
-    if(combination){
-      // Trovata combinazione
-      const grouped={};
-      combination.forEach(v=>{ grouped[v]=(grouped[v]||0)+1; });
-      const descParts=Object.entries(grouped).map(([v,n])=>`${n} moneta${n>1?'e':''} da ${valToLabel(parseInt(v))}`);
-      const desc=descParts.join(' e ');
-      const totUsed=combination.length;
-      const mainMsg=`La moneta da ${tLabel} non c'è, ma puoi fare ${tLabel} usando ${totUsed} moneta${totUsed>1?'e':''}: ${desc}.`;
-      $('res-main').textContent=mainMsg;
-
-      // Lista monete usate
+  } else if(tot>0 && (centesimi||[]).length===tot){
+    // Prova combinazione greedy
+    const combo=greedyCombo(tVal, centesimi);
+    if(combo){
+      const msg=buildComboMsg(combo, tLabel);
+      $('res-badge').textContent='💡';
+      $('res-main').textContent=`${tLabel} non trovata — ecco come ottenerla`;
+      // Segna le monete usate nella lista
+      const usedCopy=[...combo];
       const l=$('res-list'); l.innerHTML='';
-      combination.forEach((v,i)=>{
-        const r=document.createElement('div'); r.className='coin-row hi';
-        r.innerHTML=`<div class="pos-b">${i+1}</div><span>${valToLabel(v)}</span> 🪙`;
+      (centesimi||[]).forEach((cv,i)=>{
+        const idx=usedCopy.indexOf(cv);
+        const used=idx!==-1;
+        if(used) usedCopy.splice(idx,1);
+        const r=document.createElement('div'); r.className='coin-row'+(used?' hi':'');
+        r.innerHTML=`<div class="pos-b">${i+1}</div><span>${monete[i]}</span>${used?' ✓':''}`;
         l.appendChild(r);
       });
-
-      confirmMsg=`Non c'è la moneta da ${tLabel}. Puoi però usare ${desc} per fare la stessa cifra. Prendi queste ${totUsed} monete.`;
-      confirmBadge='💡';
-      speak(mainMsg);
+      confirmTxt=msg; confirmBadge='💡';
+      speak(msg);
       vib([200,100,200]);
-      setTimeout(()=>showConfirm(), 2500);
-
+      setTimeout(()=>showConfirm(),2800);
     } else {
-      // Nessuna combinazione possibile
-      const noMsg=`La moneta da ${tLabel} non è presente e non è possibile formare la cifra con le monete visibili.`;
-      $('res-main').textContent=noMsg;
+      const msg=`La moneta da ${tLabel} non è presente e non è possibile ottenerla combinando le monete visibili. Prova ad aggiungere altre monete.`;
+      $('res-badge').textContent='❌'; $('res-main').textContent=msg;
       const l=$('res-list'); l.innerHTML='';
-      (monete||[]).forEach((m,i)=>{
-        const r=document.createElement('div'); r.className='coin-row';
-        r.innerHTML=`<div class="pos-b">${i+1}</div><span>${m}</span>`;
-        l.appendChild(r);
-      });
-      confirmMsg=noMsg;
-      confirmBadge='❌';
-      speak(noMsg);
-      vib([500]);
-      setTimeout(()=>showConfirm(), 2500);
+      (monete||[]).forEach((m,i)=>{ const r=document.createElement('div'); r.className='coin-row'; r.innerHTML=`<div class="pos-b">${i+1}</div><span>${m}</span>`; l.appendChild(r); });
+      confirmTxt=msg; confirmBadge='❌';
+      speak(msg); vib([500]);
+      setTimeout(()=>showConfirm(),2500);
     }
-
   } else {
-    // CASO 3: nessuna moneta visibile
-    $('res-badge').textContent='📷';
-    $('res-main').textContent=messaggio;
-    $('res-list').innerHTML='';
-    speak(messaggio); vib([500]);
+    const msg='Non riesco a vedere monete chiaramente. Prova a migliorare l\'illuminazione e a tenere la fotocamera ferma.';
+    $('res-badge').textContent='📷'; $('res-main').textContent=msg; $('res-list').innerHTML='';
+    speak(msg); vib([500]);
   }
 }
 
-// ══ SCHERMATA CONFERMA ══
+// ══ CONFERMA ══
 function showConfirm(){
   $('conf-badge').textContent=confirmBadge;
-  $('conf-msg').textContent=confirmMsg;
+  $('conf-msg').textContent=confirmTxt;
   showScreen('screen-confirm');
-  // Riléggi il messaggio e poi chiedi conferma
-  setTimeout(()=>{
-    speak(confirmMsg+'. Hai capito?');
-  }, 300);
+  // Breve pausa poi rilegge
+  setTimeout(()=>speak(confirmTxt+' ... Hai capito?'),400);
 }
-
-$('btn-conf-yes').addEventListener('click',()=>{
-  speak('Ottimo! Torno alla schermata principale.');
-  setTimeout(()=>showScreen('screen-home'), 800);
-});
-
-$('btn-conf-no').addEventListener('click',()=>{
-  // Ripete il messaggio e poi richiede conferma vocale
-  speak(confirmMsg+'. Hai capito?');
-});
+$('btn-conf-yes').addEventListener('click',()=>{ speak('Perfetto. Torno alla schermata principale.'); setTimeout(()=>showScreen('screen-home'),800); });
+$('btn-conf-no').addEventListener('click',()=>{ speak(confirmTxt+' ... Hai capito?'); });
 
 $('btn-repeat').addEventListener('click',()=>{ initAudio(); speak(`Cerchiamo di nuovo: ${tLabel}.`); setTimeout(startCD,800); });
 $('btn-home-result').addEventListener('click',()=>showScreen('screen-home'));
 $('btn-err-home').addEventListener('click',()=>showScreen('screen-home'));
 function showErr(msg){ stopCam(); clearInterval(cdInt); $('err-msg').textContent=msg; showScreen('screen-error'); speak(msg); }
 
-// Carica voci quando disponibili
-speechSynthesis.onvoiceschanged = ()=>{ /* pronte per quando si apre impostazioni */ };
+// ══ SERVICE WORKER ══
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').then(r=>{
+    swReg=r; r.update();
+    r.addEventListener('updatefound',()=>{
+      const w=r.installing;
+      w.addEventListener('statechange',()=>{ if(w.state==='installed'&&navigator.serviceWorker.controller) $('update-banner').style.display='flex'; });
+    });
+  }).catch(()=>{});
+  navigator.serviceWorker.addEventListener('controllerchange',()=>window.location.reload(true));
+}
 
 // ══ MANIFEST INLINE ══
 (function(){
