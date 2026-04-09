@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'cercamoneta-v1.0.0.5';
+const CACHE_VERSION = 'cercamoneta-v1.0.0.6';
 const ASSETS = ['./', './index.html'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE_VERSION).then(c => c.addAll(ASSETS)));

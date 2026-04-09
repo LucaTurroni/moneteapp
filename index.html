@@ -296,7 +296,7 @@ button:focus-visible{outline:3px solid var(--gold);outline-offset:2px;}
     </button>
   </div>
   <button class="manual-link" id="btn-go-manual">oppure scegli a mano</button>
-  <span class="ver">v1.0.0.5</span>
+  <span class="ver">v1.0.0.6</span>
 </div>
 
 <!-- ══ SELEZIONE MANUALE ══ -->
@@ -380,7 +380,7 @@ button:focus-visible{outline:3px solid var(--gold);outline-offset:2px;}
   <div class="tab-panel" id="tab-upd">
     <div class="card">
       <div class="card-title">🔄 Aggiornamenti</div>
-      <p class="card-desc">Versione installata: <strong>v1.0.0.5</strong></p>
+      <p class="card-desc">Versione installata: <strong>v1.0.0.6</strong></p>
       <p class="card-desc">L'app controlla automaticamente all'avvio. Se c'è una versione nuova apparirà un banner in basso.</p>
       <button class="btn-gold" id="btn-check-upd">Controlla ora</button>
       <p id="upd-status" class="note"></p>
@@ -474,70 +474,64 @@ const LABELS={1:'1 centesimo',2:'2 centesimi',5:'5 centesimi',10:'10 centesimi',
 // Valori in ordine decrescente per greedy
 const VALS=[200,100,50,20,10,5,2,1];
 
-// ══ RICONOSCIMENTO VOCALE — mappa ESATTA ══
-// Ogni entry: [pattern_regex, valore_centesimi]
-// Ordinate dalla più specifica alla più generica
-const VOICE_PATTERNS = [
-  // 2 euro — deve matchare PRIMA di "euro" da solo
-  [/\bdue\s*euro\b/,'200'],
-  [/\b2\s*euro\b/,'200'],
-  [/\bdue\b/,'200'], // "due" da solo → 2 euro (contesto monete)
-
-  // 1 euro
-  [/\bun\s*euro\b/,'100'],
-  [/\buno\s*euro\b/,'100'],
-  [/\b1\s*euro\b/,'100'],
-
-  // 50 centesimi
-  [/\bcinquanta\s*centesimi\b/,'50'],
-  [/\b50\s*centesimi\b/,'50'],
-  [/\bmezzo\s*euro\b/,'50'],
-  [/\bcinquanta\b/,'50'],
-  [/\b0[,.]5\b/,'50'],
-  [/\b50\b/,'50'],
-
-  // 20 centesimi
-  [/\bventi\s*centesimi\b/,'20'],
-  [/\b20\s*centesimi\b/,'20'],
-  [/\bventi\b/,'20'],
-  [/\b0[,.]2\b/,'20'],
-  [/\b20\b/,'20'],
-
-  // 10 centesimi
-  [/\bdieci\s*centesimi\b/,'10'],
-  [/\b10\s*centesimi\b/,'10'],
-  [/\bdieci\b/,'10'],
-  [/\b0[,.]1\b/,'10'],
-  [/\b10\b/,'10'],
-
-  // 5 centesimi
-  [/\bcinque\s*centesimi\b/,'5'],
-  [/\b5\s*centesimi\b/,'5'],
-  [/\bcinque\b/,'5'],
-  [/\b0[,.]05\b/,'5'],
-
-  // 2 centesimi
-  [/\bdue\s*centesimi\b/,'2'],
-  [/\b2\s*centesimi\b/,'2'],
-  [/\b0[,.]02\b/,'2'],
-
-  // 1 centesimo
-  [/\bun\s*centesimo\b/,'1'],
-  [/\buno\s*centesimo\b/,'1'],
-  [/\b1\s*centesimo\b/,'1'],
-  [/\b0[,.]01\b/,'1'],
-
-  // Fallback: "euro" da solo → 1 euro
-  [/\beuro\b/,'100'],
-];
+// ══ RICONOSCIMENTO VOCALE ══
+// Strategia: cerca prima le frasi più lunghe e specifiche,
+// poi le parole singole. Mai usare .includes() su frasi corte
+// che potrebbero essere contenute in frasi più lunghe.
 
 function parseVoice(rawText) {
-  const t = rawText.toLowerCase().trim();
-  for (const [pattern, val] of VOICE_PATTERNS) {
-    if (pattern.test(t)) return parseInt(val);
+  // 1. Normalizza: minuscolo, apostrofi normali, rimuovi punteggiatura, spazi singoli
+  let t = rawText.toLowerCase()
+    .replace(/[\u2018\u2019\u0060\u0027]/g, ' ')  // apostrofi tipografici e normali
+    .replace(/[.,!?;:]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  console.log('parseVoice:', JSON.stringify(t));
+
+  // 2. Cerca frasi ESATTE nell'ordine: dalla più lunga alla più corta
+  //    Usiamo word-boundary simulato: spazio/inizio/fine stringa
+  function has(phrase) {
+    const re = new RegExp('(^|[ ]|$)' + phrase.replace(/[.*+?^${}()|\[\]\\]/g, '\\$&') + '($|[ ]|$)');
+    return re.test(t);
   }
+
+  // FRASI COMPOSTE — cercate per prime
+  if (has('due euro') || has('2 euro') || t==='due' || t==='2') return 200;
+  if (has('un euro') || has('uno euro') || has('1 euro') || t==='euro' || t==='uno' || t==='un') return 100;
+  if (has('cinquanta centesimi') || has('50 centesimi') || has('mezzo euro')) return 50;
+  if (has('venti centesimi') || has('20 centesimi')) return 20;
+  if (has('dieci centesimi') || has('10 centesimi')) return 10;
+  if (has('cinque centesimi') || has('5 centesimi')) return 5;
+  if (has('due centesimi') || has('2 centesimi')) return 2;
+  if (has('un centesimo') || has('uno centesimo') || has('1 centesimo')) return 1;
+
+  // PAROLE SINGOLE
+  if (has('cinquanta') || has('50')) return 50;
+  if (has('venti') || has('20')) return 20;
+  if (has('dieci') || has('10')) return 10;
+  if (has('cinque') || has('5')) return 5;
+  if (has('euro')) return 100;   // "euro" da solo senza numero = 1 euro
+  if (has('due') || has('2')) return 200;  // "due" senza "centesimi" = 2 euro
+  if (has('uno') || has('un') || has('1')) return 100;
+
+  // NUMERI DECIMALI (es: "0,50" → 50, "0,20" → 20)
+  const numMatch = t.match(/(\d+[.,]?\d*)/);
+  if (numMatch) {
+    const n = parseFloat(numMatch[1].replace(',','.'));
+    if (n === 2)    return 200;
+    if (n === 1)    return 100;
+    if (n === 50 || n === 0.5 || n === 0.50) return 50;
+    if (n === 20 || n === 0.2 || n === 0.20) return 20;
+    if (n === 10 || n === 0.1 || n === 0.10) return 10;
+    if (n === 5  || n === 0.05) return 5;
+    if (n === 0.02) return 2;
+    if (n === 0.01) return 1;
+  }
+
   return null;
 }
+
 
 // ══ GREEDY: combinazione con meno monete ══
 function greedyCombo(targetCents, availCents) {
@@ -889,89 +883,93 @@ Se la moneta cercata non c'è: {"monete":[...],"centesimi":[...],"posizione_cerc
 }
 
 // ══ RISULTATO ══
-const ORDINAL=['prima','seconda','terza','quarta','quinta','sesta','settima','ottava','nona','decima'];
+// ══ RISULTATO E CONFERMA ══
+let confRepeatCount = 0;
 
-function buildFoundMsg(pos, tot, lbl){
-  const ord=ORDINAL[pos-1]||`numero ${pos}`;
-  const daSx=pos===1?'è la prima partendo da sinistra':`è la ${ord} partendo da sinistra, cioè al posto numero ${pos}`;
-  const daDx=pos===tot?', ed è anche l\'ultima da destra':(pos===tot-1?`, e da destra è la seconda`:'');
-  return `Ho trovato la moneta da ${lbl}. Si trova nella fila di ${tot} monete. La moneta che cerchi ${daSx}${daDx}. Prendila al posto numero ${pos}.`;
+function buildFoundMsg(pos, tot, lbl, repeat){
+  const ORDINAL=['prima','seconda','terza','quarta','quinta','sesta','settima','ottava','nona','decima'];
+  const ord = ORDINAL[pos-1] || null;
+  if(repeat===0){
+    // Prima spiegazione: usa l'ordinale
+    if(ord) return `Trovata. Prendi la ${ord} moneta da sinistra.`;
+    return `Trovata. Prendi la moneta numero ${pos} da sinistra.`;
+  } else if(repeat===1){
+    // Non ha capito: usa il numero
+    return `La moneta numero ${pos}. Conta da sinistra e prendi la numero ${pos}.`;
+  } else {
+    // Ancora non capisce: descrizione completa
+    const dopo = pos===1 ? 'e la prima, non devi contare nulla' : `devi contare ${pos-1} moneta${pos-1>1?'e':''} da sinistra e prendere la prossima`;
+    return `La moneta da ${lbl} e al posto numero ${pos} su ${tot}. ${dopo}. Numero ${pos}.`;
+  }
 }
 
-function buildComboMsg(used, lbl){
-  // Raggruppa: {100:2, 50:1} ecc
+function buildComboMsg(used, positions, lbl, repeat){
   const grouped={};
   used.forEach(v=>{ grouped[v]=(grouped[v]||0)+1; });
-  const parts=Object.entries(grouped).map(([v,n])=>{
-    const name=LABELS[parseInt(v)];
-    return n===1?`una moneta da ${name}`:`${n} monete da ${name}`;
-  });
-  const desc=parts.length===1?parts[0]:parts.slice(0,-1).join(', ')+' e '+parts[parts.length-1];
-  const tot=used.length;
-  return `La moneta da ${lbl} non c'è nella fila. Però puoi ottenere lo stesso importo usando in totale ${tot} moneta${tot>1?'e':''}: ${desc}. Prendi queste monete dalla fila.`;
+  const parts=Object.entries(grouped).map(([v,n])=>{ const name=LABELS[parseInt(v)]; return n===1?`una moneta da ${name}`:`${n} monete da ${name}`; });
+  const desc=parts.join(' e ');
+  const posStr=positions.map(p=>`la numero ${p}`).join(', ');
+  if(repeat===0){
+    return `La moneta da ${lbl} non c e. Pero puoi usare ${desc}. Prendi ${posStr} contando da sinistra.`;
+  } else if(repeat===1){
+    return `Ripeto i numeri: prendi le monete in posizione ${positions.join(', ')}. Conta da sinistra.`;
+  } else {
+    return `Devi prendere ${positions.length} monete: ${posStr}. Insieme fanno ${lbl}.`;
+  }
 }
 
 function showResult(data){
   showScreen('screen-result');
+  confRepeatCount=0;
   const{trovata,posizione_cercata,monete,centesimi}=data;
   const tot=(monete||[]).length;
 
   if(trovata && posizione_cercata>0){
     $('res-badge').textContent='✅';
-    const msg=buildFoundMsg(posizione_cercata, tot, tLabel);
-    $('res-main').textContent=`Moneta trovata! Posizione ${posizione_cercata} su ${tot}`;
+    // Se ci sono più monete dello stesso tipo, scegli quella più vicina al centro
+    const allPositions=(centesimi||[]).reduce((acc,v,i)=>{ if(v===tVal) acc.push(i+1); return acc; },[]);
+    let bestPos=posizione_cercata;
+    if(allPositions.length>1){
+      const mid=tot/2;
+      bestPos=allPositions.reduce((best,p)=>Math.abs(p-mid)<Math.abs(best-mid)?p:best, allPositions[0]);
+    }
+    $('res-main').textContent=allPositions.length>1
+      ? `Trovate ${allPositions.length} monete da ${tLabel} — prendi la più vicina`
+      : `Trovata! Posizione ${bestPos} su ${tot}`;
     const l=$('res-list'); l.innerHTML='';
-    (monete||[]).forEach((m,i)=>{
-      const t=i+1===posizione_cercata;
-      const r=document.createElement('div'); r.className='coin-row'+(t?' hi':'');
-      r.innerHTML=`<div class="pos-b">${i+1}</div><span>${m}</span>${t?' 🎯':''}`;
-      l.appendChild(r);
-    });
-    confirmTxt=msg; confirmBadge='✅';
-    speak(msg);
-    winSound(); vib([100,50,100,50,300]);
-    setTimeout(()=>showConfirm(),2200);
+    (monete||[]).forEach((m,i)=>{ const t=i+1===bestPos; const r=document.createElement('div'); r.className='coin-row'+(t?' hi':''); r.innerHTML=`<div class="pos-b">${i+1}</div><span>${m}</span>${t?' 🎯':''}`; l.appendChild(r); });
+    confirmBadge='✅';
+    confirmTxt=JSON.stringify({type:'found',pos:bestPos,tot,lbl:tLabel});
+    speak(buildFoundMsg(bestPos,tot,tLabel,0)); winSound(); vib([100,50,100,50,300]);
+    setTimeout(()=>showConfirm(),2000);
 
   } else if(tot>0 && (centesimi||[]).length===tot){
-    // Prova combinazione greedy
     const combo=greedyCombo(tVal, centesimi);
     if(combo){
-      const msg=buildComboMsg(combo, tLabel);
+      const usedCopy=[...combo]; const positions=[]; const usedIdx=[];
+      centesimi.forEach((cv,i)=>{ const idx=usedCopy.indexOf(cv); if(idx!==-1){ usedCopy.splice(idx,1); positions.push(i+1); usedIdx.push(i); } });
       $('res-badge').textContent='💡';
-      $('res-main').textContent=`${tLabel} non trovata — ecco come ottenerla`;
-      // Segna le monete usate nella lista
-      const usedCopy=[...combo];
+      $('res-main').textContent=`${tLabel} non c'e — usa queste monete`;
       const l=$('res-list'); l.innerHTML='';
-      (centesimi||[]).forEach((cv,i)=>{
-        const idx=usedCopy.indexOf(cv);
-        const used=idx!==-1;
-        if(used) usedCopy.splice(idx,1);
-        const r=document.createElement('div'); r.className='coin-row'+(used?' hi':'');
-        r.innerHTML=`<div class="pos-b">${i+1}</div><span>${monete[i]}</span>${used?' ✓':''}`;
-        l.appendChild(r);
-      });
-      confirmTxt=msg; confirmBadge='💡';
-      speak(msg);
-      vib([200,100,200]);
-      setTimeout(()=>showConfirm(),2800);
+      centesimi.forEach((cv,i)=>{ const used=usedIdx.includes(i); const r=document.createElement('div'); r.className='coin-row'+(used?' hi':''); r.innerHTML=`<div class="pos-b">${i+1}</div><span>${monete[i]}</span>${used?' ✓':''}`; l.appendChild(r); });
+      confirmBadge='💡';
+      confirmTxt=JSON.stringify({type:'combo',combo,positions,lbl:tLabel});
+      speak(buildComboMsg(combo,positions,tLabel,0)); vib([200,100,200]);
+      setTimeout(()=>showConfirm(),2500);
     } else {
-      // Calcola quanto manca
       const totDisp=centesimi.reduce((a,b)=>a+b,0);
-      let msg;
-      if(totDisp<tVal){
-        msg=`La moneta da ${tLabel} non c'è e con le monete visibili non è possibile raggiungerla. Il totale di tutte le monete presenti è ${totDisp>=100?(totDisp/100).toFixed(totDisp%100===0?0:2)+' euro':totDisp+' centesimi'}, che è meno di ${tLabel}. Aggiungi altre monete.`;
-      } else {
-        msg=`La moneta da ${tLabel} non c'è e non è possibile formare esattamente quella cifra combinando le monete visibili, anche se il totale disponibile sarebbe sufficiente. Prova con una combinazione diversa di monete.`;
-      }
+      const dispStr=totDisp>=100?`${(totDisp/100).toFixed(totDisp%100===0?0:2)} euro`:`${totDisp} centesimi`;
+      const msg=totDisp<tVal
+        ?`Non e possibile. Mancano monete: il totale disponibile e solo ${dispStr}, meno di ${tLabel}. Aggiungi altre monete.`
+        :`Non e possibile formare esattamente ${tLabel} con queste monete. Aggiungi una moneta da ${tLabel} o cambia le monete sul tavolo.`;
       $('res-badge').textContent='❌'; $('res-main').textContent=msg;
       const l=$('res-list'); l.innerHTML='';
       (monete||[]).forEach((m,i)=>{ const r=document.createElement('div'); r.className='coin-row'; r.innerHTML=`<div class="pos-b">${i+1}</div><span>${m}</span>`; l.appendChild(r); });
-      confirmTxt=msg; confirmBadge='❌';
-      speak(msg); vib([500]);
-      setTimeout(()=>showConfirm(),2500);
+      confirmBadge='❌'; confirmTxt=JSON.stringify({type:'impossible',msg});
+      speak(msg); vib([500]); setTimeout(()=>showConfirm(),2500);
     }
   } else {
-    const msg='Non vedo monete. Assicurati che le monete siano ben illuminate, al centro dell\'inquadratura, e che la fotocamera sia a circa 20 centimetri dal tavolo. Poi riprova.';
+    const msg='Non vedo monete. Assicurati che siano ben illuminate e al centro della ripresa. Riprova.';
     $('res-badge').textContent='📷'; $('res-main').textContent=msg; $('res-list').innerHTML='';
     speak(msg); vib([500]);
   }
@@ -980,13 +978,17 @@ function showResult(data){
 // ══ CONFERMA ══
 function showConfirm(){
   $('conf-badge').textContent=confirmBadge;
-  $('conf-msg').textContent=confirmTxt;
+  const data=JSON.parse(confirmTxt);
+  let msg='';
+  if(data.type==='found') msg=buildFoundMsg(data.pos,data.tot,data.lbl,confRepeatCount);
+  else if(data.type==='combo') msg=buildComboMsg(data.combo,data.positions,data.lbl,confRepeatCount);
+  else msg=data.msg;
+  $('conf-msg').textContent=msg;
   showScreen('screen-confirm');
-  // Breve pausa poi rilegge
-  setTimeout(()=>speak(confirmTxt+' ... Hai capito?'),400);
+  setTimeout(()=>speak(msg+'. Hai capito?'),400);
 }
 $('btn-conf-yes').addEventListener('click',()=>{ speak('Perfetto. Torno alla schermata principale.'); setTimeout(()=>showScreen('screen-home'),800); });
-$('btn-conf-no').addEventListener('click',()=>{ speak(confirmTxt+' ... Hai capito?'); });
+$('btn-conf-no').addEventListener('click',()=>{ confRepeatCount++; showConfirm(); });
 
 $('btn-repeat').addEventListener('click',()=>{ initAudio(); speak(`Cerchiamo di nuovo: ${tLabel}.`); setTimeout(startCD,800); });
 $('btn-home-result').addEventListener('click',()=>showScreen('screen-home'));
